@@ -16,7 +16,7 @@
 
 - (CGPoint)bddr_presentationLayerContentOffset {
 	CALayer *presentationLayer = self.layer.presentationLayer;
-	return presentationLayer.bounds.origin;
+	return CGPointApplyAffineTransform(presentationLayer.bounds.origin, CGAffineTransformMakeScale(-1, -1));
 }
 
 @end
