@@ -7,5 +7,6 @@
 
 @property (nonatomic, assign, readonly) CGFloat bddr_presentationLayerZoomScale;
 @property (nonatomic, assign, readonly) CGPoint bddr_presentationLayerContentOffset;
+@property (nonatomic, assign, readonly) CGSize bddr_presentationLayerContentSize;
 
 @end

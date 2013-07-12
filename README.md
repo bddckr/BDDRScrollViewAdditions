@@ -2,12 +2,12 @@
 
 ##Description
 
-`UIScrollView` category to center content, add getters for animating properties.
+`UIScrollView` category to center content and add getters for animated properties.
 
-Adds `zoomScale` and `contentOffset` getters that work when an animation is running on the `UIScrollView`.
+This category adds `zoomScale`, `contentOffset` and `contentSize` getters that return correct values when an animation is running on the `UIScrollView`. These new properties are not KVO compliant but can be polled repeatedly.
 This is especially useful if you use an invisible `UIScrollView` in your OpenGL View to scroll/zoom content: In your game loop you just poll the values to position and scale your rendered content.
 
-Also adds a `centerContent` property so the content is always centered, even when zooming out.
+It also adds a `centersContent` property so the content is always centered, even when zooming out. This also works for the view returned by `-viewForZoomingInScrollView:` of the `UIScrollViewDelegate` when zooming.
 
 # Installation
 
@@ -17,5 +17,5 @@ Also adds a `centerContent` property so the content is always centered, even whe
 
 #Reasons for Existence
 
-`UIScrollView` defines `contentOffset` and `zoomScale` but this properties don't always return the correct values when `UIScrollView` is animating. These new properties are not KVO compliant but can be polled repeatedly.
-`UIScrollView` isn't centering its subviews by default. Set `centersContent` to `YES` and it will center the content view, which means this also works for the view returned by `-viewForZoomingInScrollView:` of the `UIScrollViewDelegate` when zooming.
+`UIScrollView` defines `zoomScale`, `contentOffset` and `contentSize` but these properties don't always return the correct values when `UIScrollView` is animating, for example when `zoomBouncing` is `YES`.
+`UIScrollView` isn't centering its subviews by default, `centersContent` makes this configurable.

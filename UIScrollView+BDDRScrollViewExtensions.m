@@ -25,16 +25,16 @@ static void *const BDDRScrollViewExtensionsCentersContentAssociationKey = (void 
 	CGSize contentSize = self.contentSize;
 	CGSize boundsSize = self.bounds.size;
 	
-    CGFloat top = 0.0f;
+	CGFloat top = 0.0f;
 	CGFloat left = 0.0f;
 	
-    if (contentSize.width < boundsSize.width)
-        left = (boundsSize.width - contentSize.width) / 2.0f;
+	if (contentSize.width < boundsSize.width)
+		left = (boundsSize.width - contentSize.width) / 2.0f;
 	
-    if (contentSize.height < boundsSize.height)
-        top = (boundsSize.height - contentSize.height) / 2.0f;
+	if (contentSize.height < boundsSize.height)
+		top = (boundsSize.height - contentSize.height) / 2.0f;
 	
-    self.contentInset = UIEdgeInsetsMake(top, left, top, left);
+	self.contentInset = UIEdgeInsetsMake(top, left, top, left);
 }
 
 - (BOOL)bddr_centersContent {
@@ -64,6 +64,16 @@ static void *const BDDRScrollViewExtensionsCentersContentAssociationKey = (void 
 - (CGPoint)bddr_presentationLayerContentOffset {
 	CALayer *presentationLayer = self.layer.presentationLayer;
 	return presentationLayer.bounds.origin;
+}
+
+- (CGSize)bddr_presentationLayerContentSize {
+	if ([self.delegate respondsToSelector:@selector(viewForZoomingInScrollView:)]) {
+		UIView *zoomView = [self.delegate viewForZoomingInScrollView:self];
+		CALayer *zoomPresentationLayer = zoomView.layer.presentationLayer;
+		
+		return zoomPresentationLayer.frame.size;
+	} else
+		return self.contentSize;
 }
 
 @end
