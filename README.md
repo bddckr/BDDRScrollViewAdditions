@@ -7,7 +7,7 @@
 This category adds `zoomScale`, `contentOffset` and `contentSize` getters that return correct values when an animation is running on the `UIScrollView`. These new properties are not KVO compliant but can be polled repeatedly.
 This is especially useful if you use an invisible `UIScrollView` in your OpenGL View to scroll/zoom content: In your game loop you just poll the values to position and scale your rendered content.
 
-It also adds a `centersContent` property so the content is always centered, even when zooming out. This also works for the view returned by `-viewForZoomingInScrollView:` of the `UIScrollViewDelegate` when zooming.
+It also adds properties to center the content view, even when zooming out. This also works for the view returned by `-viewForZoomingInScrollView:` of the `UIScrollViewDelegate` when zooming.
 
 # Installation
 
@@ -18,4 +18,4 @@ It also adds a `centersContent` property so the content is always centered, even
 #Reasons for Existence
 
 `UIScrollView` defines `zoomScale`, `contentOffset` and `contentSize` but these properties don't always return the correct values when `UIScrollView` is animating, for example when `zoomBouncing` is `YES`.
-`UIScrollView` isn't centering its subviews by default, `centersContent` makes this configurable.
+`UIScrollView` isn't centering its subviews by default, `-setCentersContent:`, `centersContentHorizontally` and `centersContentVertically` make this configurable.
