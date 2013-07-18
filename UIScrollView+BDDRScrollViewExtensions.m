@@ -7,7 +7,7 @@
 static void *const BDDRScrollViewExtensionsOneFingerZoomStartZoomScaleAssociationKey = (void *)&BDDRScrollViewExtensionsOneFingerZoomStartZoomScaleAssociationKey;
 static void *const BDDRScrollViewExtensionsOneFingerZoomStartLocationAssociationKey = (void *)&BDDRScrollViewExtensionsOneFingerZoomStartLocationAssociationKey;
 
-#pragma mark - Swizzling Methods
+#pragma mark - Method Swizzling
 
 + (void)load {
 	NSError *error;
@@ -19,7 +19,23 @@ static void *const BDDRScrollViewExtensionsOneFingerZoomStartLocationAssociation
 		NSLog(@"%@", [error localizedDescription]);
 }
 
-#pragma mark - Centering the Content
+#pragma mark - Utility Methods
+
+- (CGRect)zoomRectForScale:(CGFloat)scale withLocationOfGestureRecognizer:(UIGestureRecognizer *)gestureRecognizer {
+	UIView *view = [self.delegate respondsToSelector:@selector(viewForZoomingInScrollView:)] ? [self.delegate viewForZoomingInScrollView:self] : self;
+	CGPoint location = [gestureRecognizer locationInView:view];
+	CGSize boundsSize = self.bounds.size;
+	
+	CGRect zoomRect;
+	zoomRect.size.width = boundsSize.width / scale;
+	zoomRect.size.height = boundsSize.height / scale;
+	zoomRect.origin.x = location.x - (zoomRect.size.width / 2.0f);
+	zoomRect.origin.y = location.y - (zoomRect.size.height / 2.0f);
+	
+	return zoomRect;
+}
+
+#pragma mark - Content Centering
 
 - (void)bddr_centerContentIfNeeded {
 	if (!self.tracking)
@@ -38,13 +54,58 @@ static void *const BDDRScrollViewExtensionsOneFingerZoomStartLocationAssociation
 	if (self.bddr_centersContentVertically && contentSize.height < boundsSize.height)
 		verticalInset = (boundsSize.height - contentSize.height) / 2.0f;
 	
-	[self bddr_setContentInset:UIEdgeInsetsMake(verticalInset + contentInsets.top,
-												horizontalInset + contentInsets.left,
-												verticalInset + contentInsets.bottom,
-												horizontalInset + contentInsets.right)];
+	[self bddr_setContentInset:UIEdgeInsetsMake(verticalInset + contentInset.top,
+												horizontalInset + contentInset.left,
+												verticalInset + contentInset.bottom,
+												horizontalInset + contentInset.right)];
 }
 
-#pragma mark - Zooming with one Finger
+#pragma mark - Double Tap Zoom In
+
+- (void)bddr_addOrRemoveDoubleTapZoomInGestureRecognizer {
+	UITapGestureRecognizer *doubleTapZoomInGestureRecognizer;
+	
+	if (self.bddr_doubleTapZoomInEnabled) {
+		doubleTapZoomInGestureRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(bddr_handleDoubleTapZoomInGestureRecognizer:)];
+		doubleTapZoomInGestureRecognizer.numberOfTapsRequired = 2;
+		[self addGestureRecognizer:doubleTapZoomInGestureRecognizer];
+		
+		if (self.bddr_oneFingerZoomGestureRecognizer)
+			[self.bddr_oneFingerZoomGestureRecognizer requireGestureRecognizerToFail:doubleTapZoomInGestureRecognizer];
+	} else
+		[self removeGestureRecognizer:self.bddr_doubleTapZoomInGestureRecognizer];
+	
+	self.bddr_doubleTapZoomInGestureRecognizer = doubleTapZoomInGestureRecognizer;
+}
+
+- (void)bddr_handleDoubleTapZoomInGestureRecognizer:(UITapGestureRecognizer *)doubleTapZoomInGestureRecognizer {
+	CGFloat newZoomScale = self.zoomScale * self.bddr_zoomScaleStepFactor;
+	CGRect zoomRect = [self zoomRectForScale:newZoomScale withLocationOfGestureRecognizer:doubleTapZoomInGestureRecognizer];
+	[self zoomToRect:zoomRect animated:YES];
+}
+
+#pragma mark - Two Finger Zoom Out
+
+- (void)bddr_addOrRemoveTwoFingerZoomOutGestureRecognizer {
+	UITapGestureRecognizer *twoFingerZoomOutGestureRecognizer;
+	
+	if (self.bddr_twoFingerZoomOutEnabled) {
+		twoFingerZoomOutGestureRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(bddr_handleTwoFingerZoomOutGestureRecognizer:)];
+		twoFingerZoomOutGestureRecognizer.numberOfTouchesRequired = 2;
+		[self addGestureRecognizer:twoFingerZoomOutGestureRecognizer];
+	} else
+		[self removeGestureRecognizer:self.bddr_twoFingerZoomOutGestureRecognizer];
+	
+	self.bddr_twoFingerZoomOutGestureRecognizer = twoFingerZoomOutGestureRecognizer;
+}
+
+- (void)bddr_handleTwoFingerZoomOutGestureRecognizer:(UITapGestureRecognizer *)twoFingerZoomOutGestureRecognizer {
+	CGFloat newZoomScale = self.zoomScale / self.bddr_zoomScaleStepFactor;
+	CGRect zoomRect = [self zoomRectForScale:newZoomScale withLocationOfGestureRecognizer:twoFingerZoomOutGestureRecognizer];
+	[self zoomToRect:zoomRect animated:YES];
+}
+
+#pragma mark - One Finger Zoom
 
 - (void)bddr_addOrRemoveOneFingerZoomGestureRecognizer {
 	UILongPressGestureRecognizer *oneFingerZoomGestureRecognizer;
@@ -54,6 +115,9 @@ static void *const BDDRScrollViewExtensionsOneFingerZoomStartLocationAssociation
 		oneFingerZoomGestureRecognizer.numberOfTapsRequired = 1;
 		oneFingerZoomGestureRecognizer.minimumPressDuration = 0.0f;
 		[self addGestureRecognizer:oneFingerZoomGestureRecognizer];
+		
+		if (self.bddr_doubleTapZoomInGestureRecognizer)
+			[oneFingerZoomGestureRecognizer requireGestureRecognizerToFail:self.bddr_doubleTapZoomInGestureRecognizer ];
 	} else
 		[self removeGestureRecognizer:self.bddr_oneFingerZoomGestureRecognizer];
 	
@@ -61,22 +125,16 @@ static void *const BDDRScrollViewExtensionsOneFingerZoomStartLocationAssociation
 }
 
 - (void)bddr_handleOneFingerZoomGestureRecognizer:(UILongPressGestureRecognizer *)oneFingerZoomGestureRecognizer {
-	CGPoint currentLocation = [oneFingerZoomGestureRecognizer locationInView:oneFingerZoomGestureRecognizer.view.window];
+	CGPoint currentLocation = [oneFingerZoomGestureRecognizer locationInView:self.window];
 	
-	switch (oneFingerZoomGestureRecognizer.state) {
-		case UIGestureRecognizerStateBegan:
-			objc_setAssociatedObject(self, BDDRScrollViewExtensionsOneFingerZoomStartZoomScaleAssociationKey, @(self.zoomScale), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-			objc_setAssociatedObject(self, BDDRScrollViewExtensionsOneFingerZoomStartLocationAssociationKey, [NSValue valueWithCGPoint:currentLocation], OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-			break;
-		case UIGestureRecognizerStateChanged: {
-			CGFloat startZoomScale = [objc_getAssociatedObject(self, BDDRScrollViewExtensionsOneFingerZoomStartZoomScaleAssociationKey) floatValue];
-			CGPoint startLocation = [objc_getAssociatedObject(self, BDDRScrollViewExtensionsOneFingerZoomStartLocationAssociationKey) CGPointValue];
-			CGFloat newZoomScale = startZoomScale * (startLocation.y / currentLocation.y);
-			self.zoomScale = MAX(MIN(newZoomScale, self.maximumZoomScale), self.minimumZoomScale);
-			break;
-		}
-		default:
-			break;
+	if (oneFingerZoomGestureRecognizer.state == UIGestureRecognizerStateBegan) {
+		objc_setAssociatedObject(self, BDDRScrollViewExtensionsOneFingerZoomStartZoomScaleAssociationKey, @(self.zoomScale), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+		objc_setAssociatedObject(self, BDDRScrollViewExtensionsOneFingerZoomStartLocationAssociationKey, [NSValue valueWithCGPoint:currentLocation], OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+	} else if (oneFingerZoomGestureRecognizer.state == UIGestureRecognizerStateChanged) {
+		CGFloat startZoomScale = [objc_getAssociatedObject(self, BDDRScrollViewExtensionsOneFingerZoomStartZoomScaleAssociationKey) floatValue];
+		CGPoint startLocation = [objc_getAssociatedObject(self, BDDRScrollViewExtensionsOneFingerZoomStartLocationAssociationKey) CGPointValue];
+		CGFloat newZoomScale = startZoomScale * (startLocation.y / currentLocation.y);
+		self.zoomScale = MAX(MIN(newZoomScale, self.maximumZoomScale), self.minimumZoomScale);
 	}
 }
 
@@ -146,6 +204,56 @@ static void *const BDDRScrollViewExtensionsOneFingerZoomStartLocationAssociation
 - (void)setBddr_centersContentVertically:(BOOL)centersContentVertically {
 	objc_setAssociatedObject(self, @selector(bddr_centersContentVertically), @(centersContentVertically), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 	[self bddr_centerContentIfNeeded];
+}
+
+- (BOOL)bddr_doubleTapZoomInEnabled {
+	return [objc_getAssociatedObject(self, @selector(bddr_doubleTapZoomInEnabled)) boolValue];
+}
+
+- (void)setBddr_doubleTapZoomInEnabled:(BOOL)doubleTapZoomInEnabled {
+	objc_setAssociatedObject(self, @selector(bddr_doubleTapZoomInEnabled), @(doubleTapZoomInEnabled), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+	[self bddr_addOrRemoveDoubleTapZoomInGestureRecognizer];
+}
+
+- (UITapGestureRecognizer *)bddr_doubleTapZoomInGestureRecognizer {
+	return objc_getAssociatedObject(self, @selector(bddr_doubleTapZoomInGestureRecognizer));
+}
+
+- (void)setBddr_doubleTapZoomInGestureRecognizer:(UITapGestureRecognizer *)doubleTapZoomInGestureRecognizer {
+	objc_setAssociatedObject(self, @selector(bddr_doubleTapZoomInGestureRecognizer), doubleTapZoomInGestureRecognizer, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
+
+- (BOOL)bddr_twoFingerZoomOutEnabled {
+	return [objc_getAssociatedObject(self, @selector(bddr_twoFingerZoomOutEnabled)) boolValue];
+}
+
+- (void)setBddr_twoFingerZoomOutEnabled:(BOOL)twoFingerZoomOutEnabled {
+	objc_setAssociatedObject(self, @selector(bddr_twoFingerZoomOutEnabled), @(twoFingerZoomOutEnabled), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+	[self bddr_addOrRemoveTwoFingerZoomOutGestureRecognizer];
+}
+
+- (UITapGestureRecognizer *)bddr_twoFingerZoomOutGestureRecognizer {
+	return objc_getAssociatedObject(self, @selector(bddr_twoFingerZoomOutGestureRecognizer));
+}
+
+- (void)setBddr_twoFingerZoomOutGestureRecognizer:(UITapGestureRecognizer *)twoFingerZoomOutGestureRecognizer {
+	objc_setAssociatedObject(self, @selector(bddr_twoFingerZoomOutGestureRecognizer), twoFingerZoomOutGestureRecognizer, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
+
+- (CGFloat)bddr_zoomScaleStepFactor {
+	NSNumber *zoomScaleStepFactorValue = objc_getAssociatedObject(self, @selector(bddr_zoomScaleStepFactor));
+	
+	if (!zoomScaleStepFactorValue) {
+		zoomScaleStepFactorValue = @(1.5f);
+		objc_setAssociatedObject(self, @selector(bddr_zoomScaleStepFactor), zoomScaleStepFactorValue, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+	}
+	
+	return [zoomScaleStepFactorValue floatValue];
+}
+
+- (void)setBddr_zoomScaleStepFactor:(CGFloat)zoomScaleStepFactor {
+	zoomScaleStepFactor = MAX(1.0f, zoomScaleStepFactor);
+	objc_setAssociatedObject(self, @selector(bddr_zoomScaleStepFactor), @(zoomScaleStepFactor), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
 
 - (BOOL)bddr_oneFingerZoomEnabled {
