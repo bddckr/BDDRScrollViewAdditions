@@ -79,6 +79,11 @@ static void *const BDDRScrollViewAdditionsOneFingerZoomStartLocationAssociationK
 }
 
 - (void)bddr_handleDoubleTapZoomInGestureRecognizer:(UITapGestureRecognizer *)doubleTapZoomInGestureRecognizer {
+	if (self.zoomScale == self.maximumZoomScale && self.bddr_doubleTapZoomsToMinimumZoomScaleAtMaximumZoom) {
+		[self setZoomScale:self.minimumZoomScale animated:YES];
+		return;
+	}
+	
 	CGFloat newZoomScale = self.zoomScale * self.bddr_zoomScaleStepFactor;
 	CGRect zoomRect = [self zoomRectForScale:newZoomScale withLocationOfGestureRecognizer:doubleTapZoomInGestureRecognizer];
 	[self zoomToRect:zoomRect animated:YES];
@@ -213,6 +218,21 @@ static void *const BDDRScrollViewAdditionsOneFingerZoomStartLocationAssociationK
 - (void)setBddr_doubleTapZoomInEnabled:(BOOL)doubleTapZoomInEnabled {
 	objc_setAssociatedObject(self, @selector(bddr_doubleTapZoomInEnabled), @(doubleTapZoomInEnabled), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 	[self bddr_addOrRemoveDoubleTapZoomInGestureRecognizer];
+}
+
+- (BOOL)bddr_doubleTapZoomsToMinimumZoomScaleAtMaximumZoom {
+	NSNumber *doubleTapZoomsToMinimumZoomScaleAtMaximumZoomValue = objc_getAssociatedObject(self, @selector(bddr_doubleTapZoomsToMinimumZoomScaleAtMaximumZoom));
+	
+	if (!doubleTapZoomsToMinimumZoomScaleAtMaximumZoomValue) {
+		doubleTapZoomsToMinimumZoomScaleAtMaximumZoomValue = @(YES);
+		objc_setAssociatedObject(self, @selector(bddr_doubleTapZoomsToMinimumZoomScaleAtMaximumZoom), doubleTapZoomsToMinimumZoomScaleAtMaximumZoomValue, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+	}
+	
+	return [doubleTapZoomsToMinimumZoomScaleAtMaximumZoomValue boolValue];
+}
+
+- (void)setBddr_doubleTapZoomsToMinimumZoomScaleAtMaximumZoom:(BOOL)doubleTapZoomsToMinimumZoomScaleAtMaximumZoom {
+	objc_setAssociatedObject(self, @selector(bddr_doubleTapZoomsToMinimumZoomScaleAtMaximumZoom), @(doubleTapZoomsToMinimumZoomScaleAtMaximumZoom), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
 
 - (UITapGestureRecognizer *)bddr_doubleTapZoomInGestureRecognizer {

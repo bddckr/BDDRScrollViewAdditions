@@ -37,9 +37,17 @@
  * \details If the value of this property is \c YES, the scroll view zooms in the content when the user taps two times with one finger: \code self.zoomScale *= self.bddr_zoomScaleStepFactor; \endcode
  * \details The default value is \c NO.
  * \attention When zooming is disabled, the scroll view does not enable zooming via this property. See the documentation of \c UIScrollView on how to enable zooming.
- * \see bddr_zoomScaleStepFactor, bddr_doubleTapZoomInGestureRecognizer
+ * \see bddr_zoomScaleStepFactor, bddr_doubleTapZoomsToMinimumZoomScaleAtMaximumZoom, bddr_doubleTapZoomInGestureRecognizer
  */
 @property (nonatomic, assign) BOOL bddr_doubleTapZoomInEnabled;
+
+/*!
+ * \brief A Boolean value that determines whether zooming to \c minimumZoomScale when double-tapping at \c maximumZoomScale is enabled.
+ * \details If the value of this property is \c YES, the scroll view zooms to \c minimumZoomScale when the user taps two times with one finger and \c zoomScale is \c maxmimumScale.
+ * \details The default value is \c YES.
+ * \see minimumZoomScale, maximumZoomScale, zoomScale
+ */
+@property (nonatomic, assign) BOOL bddr_doubleTapZoomsToMinimumZoomScaleAtMaximumZoom;
 
 /*!
  * \brief The underlying gesture recognizer for double-tap-zoom-in gestures. (read-only)
