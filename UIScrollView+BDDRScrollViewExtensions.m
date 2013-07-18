@@ -46,7 +46,7 @@ static void *const BDDRScrollViewExtensionsOneFingerZoomStartLocationAssociation
 
 #pragma mark - Zooming with one Finger
 
-- (void)bddr_addOrRemoveOneFingerGestureRecognizer {
+- (void)bddr_addOrRemoveOneFingerZoomGestureRecognizer {
 	UILongPressGestureRecognizer *oneFingerZoomGestureRecognizer;
 	
 	if (self.bddr_oneFingerZoomEnabled) {
@@ -154,7 +154,7 @@ static void *const BDDRScrollViewExtensionsOneFingerZoomStartLocationAssociation
 
 - (void)setBddr_oneFingerZoomEnabled:(BOOL)oneFingerZoomEnabled {
 	objc_setAssociatedObject(self, @selector(bddr_oneFingerZoomEnabled), @(oneFingerZoomEnabled), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-	[self bddr_addOrRemoveOneFingerGestureRecognizer];
+	[self bddr_addOrRemoveOneFingerZoomGestureRecognizer];
 }
 
 - (UILongPressGestureRecognizer *)bddr_oneFingerZoomGestureRecognizer {
