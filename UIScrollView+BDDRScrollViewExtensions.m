@@ -4,11 +4,10 @@
 
 @implementation UIScrollView (BDDRScrollViewExtensions)
 
-static void *const BDDRScrollViewExtensionsContentInsetAssociationKey = (void *)&BDDRScrollViewExtensionsContentInsetAssociationKey;
-static void *const BDDRScrollViewExtensionsCentersContentHorizontallyAssociationKey = (void *)&BDDRScrollViewExtensionsCentersContentHorizontallyAssociationKey;
-static void *const BDDRScrollViewExtensionsCentersContentVerticallyAssociationKey = (void *)&BDDRScrollViewExtensionsCentersContentVerticallyAssociationKey;
+static void *const BDDRScrollViewExtensionsOneFingerZoomStartZoomScaleAssociationKey = (void *)&BDDRScrollViewExtensionsOneFingerZoomStartZoomScaleAssociationKey;
+static void *const BDDRScrollViewExtensionsOneFingerZoomStartLocationAssociationKey = (void *)&BDDRScrollViewExtensionsOneFingerZoomStartLocationAssociationKey;
 
-#pragma mark - Initializing the Class
+#pragma mark - Swizzling Methods
 
 + (void)load {
 	NSError *error;
@@ -20,7 +19,12 @@ static void *const BDDRScrollViewExtensionsCentersContentVerticallyAssociationKe
 		NSLog(@"%@", [error localizedDescription]);
 }
 
-#pragma mark - Helper Methods
+#pragma mark - Centering the Content
+
+- (void)bddr_centerContentIfNeeded {
+	if (!self.tracking)
+		[self bddr_centerContent];
+}
 
 - (void)bddr_centerContent {
 	CGSize contentSize = self.contentSize;
@@ -40,9 +44,40 @@ static void *const BDDRScrollViewExtensionsCentersContentVerticallyAssociationKe
 												horizontalInset + contentInsets.right)];
 }
 
-- (void)bddr_refreshContentOffsetIfNeeded {
-	if (!self.tracking)
-		[self bddr_centerContent];
+#pragma mark - Zooming with one Finger
+
+- (void)bddr_addOrRemoveOneFingerGestureRecognizer {
+	UILongPressGestureRecognizer *oneFingerZoomGestureRecognizer;
+	
+	if (self.bddr_oneFingerZoomEnabled) {
+		oneFingerZoomGestureRecognizer = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(bddr_handleOneFingerZoomGestureRecognizer:)];
+		oneFingerZoomGestureRecognizer.numberOfTapsRequired = 1;
+		oneFingerZoomGestureRecognizer.minimumPressDuration = 0.0f;
+		[self addGestureRecognizer:oneFingerZoomGestureRecognizer];
+	} else
+		[self removeGestureRecognizer:self.bddr_oneFingerZoomGestureRecognizer];
+	
+	self.bddr_oneFingerZoomGestureRecognizer = oneFingerZoomGestureRecognizer;
+}
+
+- (void)bddr_handleOneFingerZoomGestureRecognizer:(UILongPressGestureRecognizer *)oneFingerZoomGestureRecognizer {
+	CGPoint currentLocation = [oneFingerZoomGestureRecognizer locationInView:oneFingerZoomGestureRecognizer.view.window];
+	
+	switch (oneFingerZoomGestureRecognizer.state) {
+		case UIGestureRecognizerStateBegan:
+			objc_setAssociatedObject(self, BDDRScrollViewExtensionsOneFingerZoomStartZoomScaleAssociationKey, @(self.zoomScale), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+			objc_setAssociatedObject(self, BDDRScrollViewExtensionsOneFingerZoomStartLocationAssociationKey, [NSValue valueWithCGPoint:currentLocation], OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+			break;
+		case UIGestureRecognizerStateChanged: {
+			CGFloat startZoomScale = [objc_getAssociatedObject(self, BDDRScrollViewExtensionsOneFingerZoomStartZoomScaleAssociationKey) floatValue];
+			CGPoint startLocation = [objc_getAssociatedObject(self, BDDRScrollViewExtensionsOneFingerZoomStartLocationAssociationKey) CGPointValue];
+			CGFloat newZoomScale = startZoomScale * (startLocation.y / currentLocation.y);
+			self.zoomScale = MAX(MIN(newZoomScale, self.maximumZoomScale), self.minimumZoomScale);
+			break;
+		}
+		default:
+			break;
+	}
 }
 
 #pragma mark - Overridden Getters and Setters
@@ -53,38 +88,15 @@ static void *const BDDRScrollViewExtensionsCentersContentVerticallyAssociationKe
 }
 
 - (UIEdgeInsets)bddr_contentInset {
-	return [objc_getAssociatedObject(self, BDDRScrollViewExtensionsContentInsetAssociationKey) UIEdgeInsetsValue];
+	return [objc_getAssociatedObject(self, @selector(bddr_contentInset)) UIEdgeInsetsValue];
 }
 
 - (void)bddr_setContentInset:(UIEdgeInsets)contentInset {
-	objc_setAssociatedObject(self, BDDRScrollViewExtensionsContentInsetAssociationKey, [NSValue valueWithUIEdgeInsets:contentInset], OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-	[self bddr_refreshContentOffsetIfNeeded];
+	objc_setAssociatedObject(self, @selector(bddr_contentInset), [NSValue valueWithUIEdgeInsets:contentInset], OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+	[self bddr_centerContentIfNeeded];
 }
 
-#pragma mark - Getters and Setters
-
-- (void)bddr_setCentersContent:(BOOL)centersContent {
-	self.bddr_centersContentHorizontally = centersContent;
-	self.bddr_centersContentVertically = centersContent;
-}
-
-- (BOOL)bddr_centersContentHorizontally {
-	return [objc_getAssociatedObject(self, BDDRScrollViewExtensionsCentersContentHorizontallyAssociationKey) boolValue];
-}
-
-- (void)setBddr_centersContentHorizontally:(BOOL)centersContentHorizontally {
-	objc_setAssociatedObject(self, BDDRScrollViewExtensionsCentersContentHorizontallyAssociationKey, @(centersContentHorizontally), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-	[self bddr_refreshContentOffsetIfNeeded];
-}
-
-- (BOOL)bddr_centersContentVertically {
-	return [objc_getAssociatedObject(self, BDDRScrollViewExtensionsCentersContentVerticallyAssociationKey) boolValue];
-}
-
-- (void)setBddr_centersContentVertically:(BOOL)centersContentVertically {
-	objc_setAssociatedObject(self, BDDRScrollViewExtensionsCentersContentVerticallyAssociationKey, @(centersContentVertically), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-	[self bddr_refreshContentOffsetIfNeeded];
-}
+#pragma mark - Getters of animated Properties
 
 - (CGPoint)bddr_presentationLayerContentOffset {
 	CALayer *presentationLayer = self.layer.presentationLayer;
@@ -109,6 +121,48 @@ static void *const BDDRScrollViewExtensionsCentersContentVerticallyAssociationKe
 		return zoomPresentationLayer.transform.m11;
 	} else
 		return self.zoomScale;
+}
+
+#pragma mark - Getters and Setters
+
+- (void)bddr_setCentersContent:(BOOL)centersContent {
+	self.bddr_centersContentHorizontally = centersContent;
+	self.bddr_centersContentVertically = centersContent;
+}
+
+- (BOOL)bddr_centersContentHorizontally {
+	return [objc_getAssociatedObject(self, @selector(bddr_centersContentHorizontally)) boolValue];
+}
+
+- (void)setBddr_centersContentHorizontally:(BOOL)centersContentHorizontally {
+	objc_setAssociatedObject(self, @selector(bddr_centersContentHorizontally), @(centersContentHorizontally), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+	[self bddr_centerContentIfNeeded];
+}
+
+- (BOOL)bddr_centersContentVertically {
+	return [objc_getAssociatedObject(self, @selector(bddr_centersContentVertically)) boolValue];
+}
+
+- (void)setBddr_centersContentVertically:(BOOL)centersContentVertically {
+	objc_setAssociatedObject(self, @selector(bddr_centersContentVertically), @(centersContentVertically), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+	[self bddr_centerContentIfNeeded];
+}
+
+- (BOOL)bddr_oneFingerZoomEnabled {
+	return [objc_getAssociatedObject(self, @selector(bddr_oneFingerZoomEnabled)) boolValue];
+}
+
+- (void)setBddr_oneFingerZoomEnabled:(BOOL)oneFingerZoomEnabled {
+	objc_setAssociatedObject(self, @selector(bddr_oneFingerZoomEnabled), @(oneFingerZoomEnabled), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+	[self bddr_addOrRemoveOneFingerGestureRecognizer];
+}
+
+- (UILongPressGestureRecognizer *)bddr_oneFingerZoomGestureRecognizer {
+	return objc_getAssociatedObject(self, @selector(bddr_oneFingerZoomGestureRecognizer));
+}
+
+- (void)setBddr_oneFingerZoomGestureRecognizer:(UILongPressGestureRecognizer *)oneFingerZoomGestureRecognizer {
+	objc_setAssociatedObject(self, @selector(bddr_oneFingerZoomGestureRecognizer), oneFingerZoomGestureRecognizer, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
 
 @end

@@ -33,6 +33,23 @@
 @property (nonatomic, assign) BOOL bddr_centersContentVertically;
 
 /*!
+ * \brief A Boolean value that determines whether zooming with one finger is enabled.
+ * \details If the value of this property is \c YES, zooming with one finger is enabled, and if it is \c NO, zooming with one finger is disabled.
+ * When zooming is disabled, the scroll view does not enable zooming via this property. See the documentation of \c UIScrollView on how to enable zooming.
+ * \details The default value is \c NO.
+ * \see bddr_oneFingerZoomGestureRecognizer
+ */
+@property (nonatomic, assign) BOOL bddr_oneFingerZoomEnabled;
+
+/*!
+ * \brief The underlying gesture recognizer for one finger zoom gestures. (read-only)
+ * \details Your application accesses this property when it wants to more precisely control which one finger zoom gestures are recognized by the scroll view.
+ * \details This property is nil if \c bddr_oneFingerZoomEnabled is set to \c NO.
+ * \see bddr_oneFingerZoomEnabled
+ */
+@property (nonatomic, strong, readonly) UILongPressGestureRecognizer *bddr_oneFingerZoomGestureRecognizer;
+
+/*!
  * \brief The receiver's \c contentOffset property, during animations. (read-only)
  * \details \c contentOffset returns the wrong value if the receiver is animating, for example when \c zoomBouncing is \c YES.
  * \see contentOffset
