@@ -2,14 +2,16 @@
 
 ## Description
 
-`UIScrollView` category to center content, enable one finger zooming and add getters for animated properties.
+`UIScrollView` category to center content, enable additional zoom gestures and add getters for animated properties.
 
-This category adds `zoomScale`, `contentOffset` and `contentSize` getters that return correct values when an animation is running on the `UIScrollView`. These new properties are not KVO compliant but can be polled repeatedly.
-This is especially useful if you use an invisible `UIScrollView` in your OpenGL View to scroll/zoom content: In your game loop you just poll the values to position and scale your rendered content.
+This category adds properties to enable and configure:
 
-Enable one finger zooming ([like in the Google Maps iOS app](http://littlebigdetails.com/post/51559128905/)) with this category by setting `oneFingerZoomEnabled` to `YES`. You can customize the gesture recognizer by accessing the `oneFingerZoomGestureRecognizer` property.
++ Centering the content view, even when zooming out and having the `UIScrollView` bouncing. This also works for the view returned by `-viewForZoomingInScrollView:` of the `UIScrollViewDelegate` when zooming.
 
-It also adds properties to center the content view, even when zooming out and having the `UIScrollView` bouncing. This also works for the view returned by `-viewForZoomingInScrollView:` of the `UIScrollViewDelegate` when zooming.
++ Double-tapping to zoom in, two-finger-tapping to zoom out and one-finger-zooming ([like in the Google Maps iOS app](http://littlebigdetails.com/post/51559128905/)). Properties to access the gesture recognizers are provided.
+
+Additionally, this category adds `zoomScale`, `contentOffset` and `contentSize` getters that return correct values when an animation is running on the `UIScrollView`. These new properties are not KVO compliant but can be polled repeatedly.  
+This is especially useful if you use an `UIScrollView` in your OpenGL View to scroll/zoom content: In your game loop you just poll the values to position and scale your rendered content.
 
 ## Installation
 
@@ -19,13 +21,17 @@ It also adds properties to center the content view, even when zooming out and ha
 
 ## Reasons for Existence
 
++ Centering the content view is not done by default.
+
++ By default there is no support for double-tap-zoom-in, two-finger-zoom-out or one-finger-zoom gestures.
+
 + `UIScrollView` defines `zoomScale`, `contentOffset` and `contentSize` but these properties don't always return the correct values when `UIScrollView` is animating, for example when `zoomBouncing` is `YES`.
-+ Zooming with two fingers is cumbersome, `oneFingerZoomEnabled` enables the user to zoom with just one finger.
-+ Centering the content view is not done by default, so `-setCentersContent:`, `centersContentHorizontally` and `centersContentVertically` make this configurable.
 
 ## Contact
-Follow Christopher - Marcel Böddecker ([@bddckr](https://twitter.com/bddckr)) on Twitter.
+
+Follow [@bddckr](https://twitter.com/bddckr) on Twitter.
 
 ## Copyright and License
+
 Copyright (c) 2013 Christopher - Marcel Böddecker  
 Licensed under [The MIT License (MIT)](http://choosealicense.com/licenses/mit).
