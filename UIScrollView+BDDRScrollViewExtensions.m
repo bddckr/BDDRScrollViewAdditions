@@ -29,7 +29,7 @@ static void *const BDDRScrollViewExtensionsOneFingerZoomStartLocationAssociation
 - (void)bddr_centerContent {
 	CGSize contentSize = self.contentSize;
 	CGSize boundsSize = self.bounds.size;
-	UIEdgeInsets contentInsets = self.contentInset;
+	UIEdgeInsets contentInset = self.contentInset;
 	CGFloat horizontalInset = 0.0f;
 	CGFloat verticalInset = 0.0f;
 	

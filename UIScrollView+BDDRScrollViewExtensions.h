@@ -9,7 +9,7 @@
 /*!
  * \brief Sets the \c bddr_centersContentHorizontally and \c bddr_centersContentVertically properties of the receiver.
  * \param centersContent The new value to use for the receiver's \c bddr_centersContentHorizontally and \c bddr_centersContentVertically properties.
- * \attention The receiver's \c contentInset is added to a calculated \c UIEdgeInset that centers the content view.
+ * \attention The receiver's \c contentInset is added to a calculated \c UIEdgeInsets that centers the content view.
  * \see bddr_centersContentHorizontally, bddr_centersContentVertically
  */
 - (void)bddr_setCentersContent:(BOOL)centersContent;
@@ -18,7 +18,7 @@
  * \brief A Boolean value that determines whether the receiver's content view is centered horizontally.
  * \details Setting the value of this property to \c YES centers the receiver's content view horizontally and setting it to \c NO stops the horizontal centering.
  * \details The default value is \c NO.
- * \attention The receiver's \c contentInset is added to a calculated \c UIEdgeInset that centers the content view horizontally.
+ * \attention The receiver's \c contentInset is added to a calculated \c UIEdgeInsets that centers the content view horizontally.
  * \see bddr_centersContentVertically
  */
 @property (nonatomic, assign) BOOL bddr_centersContentHorizontally;
@@ -27,7 +27,7 @@
  * \brief A Boolean value that determines whether the receiver's content view is centered vertically.
  * \details Setting the value of this property to \c YES centers the receiver's content view vertically and setting it to \c NO stops the vertical centering.
  * \details The default value is \c NO.
- * \attention The receiver's \c contentInset is added to a calculated \c UIEdgeInset that centers the content view vertically.
+ * \attention The receiver's \c contentInset is added to a calculated \c UIEdgeInsets that centers the content view vertically.
  * \see bddr_centersContentHorizontally
  */
 @property (nonatomic, assign) BOOL bddr_centersContentVertically;
