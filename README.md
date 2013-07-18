@@ -1,4 +1,4 @@
-# BDDRScrollViewExtensions
+# BDDRScrollViewAdditions
 
 ## Description
 
@@ -16,7 +16,7 @@ This is especially useful if you use an `UIScrollView` in your OpenGL View to sc
 ## Installation
 
     $ cd /path/to/top/of/your/project
-    $ git submodule add git://github.com/bddckr/BDDRScrollViewExtensions.git BDDRScrollViewExtensions
+    $ git submodule add git://github.com/bddckr/BDDRScrollViewAdditions.git BDDRScrollViewAdditions
     $ git submodule init && git submodule update
 
 ## Reasons for Existence

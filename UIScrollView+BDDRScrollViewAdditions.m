@@ -1,11 +1,11 @@
-#import "UIScrollView+BDDRScrollViewExtensions.h"
+#import "UIScrollView+BDDRScrollViewAdditions.h"
 #import "JRSwizzle.h"
 #import <objc/runtime.h>
 
-@implementation UIScrollView (BDDRScrollViewExtensions)
+@implementation UIScrollView (BDDRScrollViewAdditions)
 
-static void *const BDDRScrollViewExtensionsOneFingerZoomStartZoomScaleAssociationKey = (void *)&BDDRScrollViewExtensionsOneFingerZoomStartZoomScaleAssociationKey;
-static void *const BDDRScrollViewExtensionsOneFingerZoomStartLocationAssociationKey = (void *)&BDDRScrollViewExtensionsOneFingerZoomStartLocationAssociationKey;
+static void *const BDDRScrollViewAdditionsOneFingerZoomStartZoomScaleAssociationKey = (void *)&BDDRScrollViewAdditionsOneFingerZoomStartZoomScaleAssociationKey;
+static void *const BDDRScrollViewAdditionsOneFingerZoomStartLocationAssociationKey = (void *)&BDDRScrollViewAdditionsOneFingerZoomStartLocationAssociationKey;
 
 #pragma mark - Method Swizzling
 
@@ -128,11 +128,11 @@ static void *const BDDRScrollViewExtensionsOneFingerZoomStartLocationAssociation
 	CGPoint currentLocation = [oneFingerZoomGestureRecognizer locationInView:self.window];
 	
 	if (oneFingerZoomGestureRecognizer.state == UIGestureRecognizerStateBegan) {
-		objc_setAssociatedObject(self, BDDRScrollViewExtensionsOneFingerZoomStartZoomScaleAssociationKey, @(self.zoomScale), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-		objc_setAssociatedObject(self, BDDRScrollViewExtensionsOneFingerZoomStartLocationAssociationKey, [NSValue valueWithCGPoint:currentLocation], OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+		objc_setAssociatedObject(self, BDDRScrollViewAdditionsOneFingerZoomStartZoomScaleAssociationKey, @(self.zoomScale), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+		objc_setAssociatedObject(self, BDDRScrollViewAdditionsOneFingerZoomStartLocationAssociationKey, [NSValue valueWithCGPoint:currentLocation], OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 	} else if (oneFingerZoomGestureRecognizer.state == UIGestureRecognizerStateChanged) {
-		CGFloat startZoomScale = [objc_getAssociatedObject(self, BDDRScrollViewExtensionsOneFingerZoomStartZoomScaleAssociationKey) floatValue];
-		CGPoint startLocation = [objc_getAssociatedObject(self, BDDRScrollViewExtensionsOneFingerZoomStartLocationAssociationKey) CGPointValue];
+		CGFloat startZoomScale = [objc_getAssociatedObject(self, BDDRScrollViewAdditionsOneFingerZoomStartZoomScaleAssociationKey) floatValue];
+		CGPoint startLocation = [objc_getAssociatedObject(self, BDDRScrollViewAdditionsOneFingerZoomStartLocationAssociationKey) CGPointValue];
 		CGFloat newZoomScale = startZoomScale * (startLocation.y / currentLocation.y);
 		self.zoomScale = MAX(MIN(newZoomScale, self.maximumZoomScale), self.minimumZoomScale);
 	}

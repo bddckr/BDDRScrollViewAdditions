@@ -4,7 +4,7 @@
 /*!
  * \brief \c UIScrollView category to center content and add getters for animated properties.
  */
-@interface UIScrollView (BDDRScrollViewExtensions)
+@interface UIScrollView (BDDRScrollViewAdditions)
 
 /*!
  * \brief Sets the \c bddr_centersContentHorizontally and \c bddr_centersContentVertically properties of the receiver.
