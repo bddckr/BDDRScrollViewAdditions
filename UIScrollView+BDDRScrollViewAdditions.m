@@ -5,7 +5,7 @@
 @implementation UIScrollView (BDDRScrollViewAdditions)
 
 static void *const BDDRScrollViewAdditionsOneFingerZoomStartZoomScaleAssociationKey = (void *)&BDDRScrollViewAdditionsOneFingerZoomStartZoomScaleAssociationKey;
-static void *const BDDRScrollViewAdditionsOneFingerZoomStartLocationAssociationKey = (void *)&BDDRScrollViewAdditionsOneFingerZoomStartLocationAssociationKey;
+static void *const BDDRScrollViewAdditionsOneFingerZoomStartLocationYAssociationKey = (void *)&BDDRScrollViewAdditionsOneFingerZoomStartLocationYAssociationKey;
 
 #pragma mark - Method Swizzling
 
@@ -21,14 +21,14 @@ static void *const BDDRScrollViewAdditionsOneFingerZoomStartLocationAssociationK
 
 #pragma mark - Utility Methods
 
-- (CGRect)zoomRectForScale:(CGFloat)scale withLocationOfGestureRecognizer:(UIGestureRecognizer *)gestureRecognizer {
+- (CGRect)zoomRectForZoomScale:(CGFloat)zoomScale withLocationOfGestureRecognizer:(UIGestureRecognizer *)gestureRecognizer {
 	UIView *view = [self.delegate respondsToSelector:@selector(viewForZoomingInScrollView:)] ? [self.delegate viewForZoomingInScrollView:self] : self;
 	CGPoint location = [gestureRecognizer locationInView:view];
 	CGSize boundsSize = self.bounds.size;
-	
 	CGRect zoomRect;
-	zoomRect.size.width = boundsSize.width / scale;
-	zoomRect.size.height = boundsSize.height / scale;
+	
+	zoomRect.size.width = boundsSize.width / zoomScale;
+	zoomRect.size.height = boundsSize.height / zoomScale;
 	zoomRect.origin.x = location.x - (zoomRect.size.width / 2.0f);
 	zoomRect.origin.y = location.y - (zoomRect.size.height / 2.0f);
 	
@@ -85,7 +85,7 @@ static void *const BDDRScrollViewAdditionsOneFingerZoomStartLocationAssociationK
 	}
 	
 	CGFloat newZoomScale = self.zoomScale * self.bddr_zoomScaleStepFactor;
-	CGRect zoomRect = [self zoomRectForScale:newZoomScale withLocationOfGestureRecognizer:doubleTapZoomInGestureRecognizer];
+	CGRect zoomRect = [self zoomRectForZoomScale:newZoomScale withLocationOfGestureRecognizer:doubleTapZoomInGestureRecognizer];
 	[self zoomToRect:zoomRect animated:YES];
 }
 
@@ -106,7 +106,7 @@ static void *const BDDRScrollViewAdditionsOneFingerZoomStartLocationAssociationK
 
 - (void)bddr_handleTwoFingerZoomOutGestureRecognizer:(UITapGestureRecognizer *)twoFingerZoomOutGestureRecognizer {
 	CGFloat newZoomScale = self.zoomScale / self.bddr_zoomScaleStepFactor;
-	CGRect zoomRect = [self zoomRectForScale:newZoomScale withLocationOfGestureRecognizer:twoFingerZoomOutGestureRecognizer];
+	CGRect zoomRect = [self zoomRectForZoomScale:newZoomScale withLocationOfGestureRecognizer:twoFingerZoomOutGestureRecognizer];
 	[self zoomToRect:zoomRect animated:YES];
 }
 
@@ -130,16 +130,21 @@ static void *const BDDRScrollViewAdditionsOneFingerZoomStartLocationAssociationK
 }
 
 - (void)bddr_handleOneFingerZoomGestureRecognizer:(UILongPressGestureRecognizer *)oneFingerZoomGestureRecognizer {
-	CGPoint currentLocation = [oneFingerZoomGestureRecognizer locationInView:self.window];
+	CGFloat currentLocationY = [oneFingerZoomGestureRecognizer locationInView:self.window].y;
 	
 	if (oneFingerZoomGestureRecognizer.state == UIGestureRecognizerStateBegan) {
 		objc_setAssociatedObject(self, BDDRScrollViewAdditionsOneFingerZoomStartZoomScaleAssociationKey, @(self.zoomScale), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-		objc_setAssociatedObject(self, BDDRScrollViewAdditionsOneFingerZoomStartLocationAssociationKey, [NSValue valueWithCGPoint:currentLocation], OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+		objc_setAssociatedObject(self, BDDRScrollViewAdditionsOneFingerZoomStartLocationYAssociationKey, @(currentLocationY), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 	} else if (oneFingerZoomGestureRecognizer.state == UIGestureRecognizerStateChanged) {
 		CGFloat startZoomScale = [objc_getAssociatedObject(self, BDDRScrollViewAdditionsOneFingerZoomStartZoomScaleAssociationKey) floatValue];
-		CGPoint startLocation = [objc_getAssociatedObject(self, BDDRScrollViewAdditionsOneFingerZoomStartLocationAssociationKey) CGPointValue];
-		CGFloat newZoomScale = startZoomScale * (startLocation.y / currentLocation.y);
-		self.zoomScale = MAX(MIN(newZoomScale, self.maximumZoomScale), self.minimumZoomScale);
+		CGFloat startLocationY = [objc_getAssociatedObject(self, BDDRScrollViewAdditionsOneFingerZoomStartLocationYAssociationKey) floatValue];
+		CGFloat boundsSizeY = self.bounds.size.height;
+		CGFloat zoomFactor = (startLocationY - currentLocationY) / (boundsSizeY / 2.0f);
+		
+		if (zoomFactor > 0.0f)
+			self.zoomScale = startZoomScale * (1.0f + zoomFactor * self.bddr_zoomScaleStepFactor);
+		else if (zoomFactor < 0.0f)
+			self.zoomScale = startZoomScale / (1.0f + -zoomFactor * self.bddr_zoomScaleStepFactor);
 	}
 }
 
