@@ -6,6 +6,7 @@
 
 static void *const BDDRScrollViewAdditionsOneFingerZoomStartZoomScaleAssociationKey = (void *)&BDDRScrollViewAdditionsOneFingerZoomStartZoomScaleAssociationKey;
 static void *const BDDRScrollViewAdditionsOneFingerZoomStartLocationYAssociationKey = (void *)&BDDRScrollViewAdditionsOneFingerZoomStartLocationYAssociationKey;
+static void *const BDDRScrollViewAdditionsOneFingerZoomBouncesZoomAtStartAssociationKey = (void *)&BDDRScrollViewAdditionsOneFingerZoomBouncesZoomAtStartAssociationKey;
 
 #pragma mark - Method Swizzling
 
@@ -132,19 +133,44 @@ static void *const BDDRScrollViewAdditionsOneFingerZoomStartLocationYAssociation
 - (void)bddr_handleOneFingerZoomGestureRecognizer:(UILongPressGestureRecognizer *)oneFingerZoomGestureRecognizer {
 	CGFloat currentLocationY = [oneFingerZoomGestureRecognizer locationInView:self.window].y;
 	
-	if (oneFingerZoomGestureRecognizer.state == UIGestureRecognizerStateBegan) {
-		objc_setAssociatedObject(self, BDDRScrollViewAdditionsOneFingerZoomStartZoomScaleAssociationKey, @(self.zoomScale), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-		objc_setAssociatedObject(self, BDDRScrollViewAdditionsOneFingerZoomStartLocationYAssociationKey, @(currentLocationY), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-	} else if (oneFingerZoomGestureRecognizer.state == UIGestureRecognizerStateChanged) {
-		CGFloat startZoomScale = [objc_getAssociatedObject(self, BDDRScrollViewAdditionsOneFingerZoomStartZoomScaleAssociationKey) floatValue];
-		CGFloat startLocationY = [objc_getAssociatedObject(self, BDDRScrollViewAdditionsOneFingerZoomStartLocationYAssociationKey) floatValue];
-		CGFloat boundsSizeY = self.bounds.size.height;
-		CGFloat zoomFactor = (startLocationY - currentLocationY) / (boundsSizeY / 2.0f);
-		
-		if (zoomFactor > 0.0f)
-			self.zoomScale = startZoomScale * (1.0f + zoomFactor * self.bddr_zoomScaleStepFactor);
-		else if (zoomFactor < 0.0f)
-			self.zoomScale = startZoomScale / (1.0f + -zoomFactor * self.bddr_zoomScaleStepFactor);
+	switch (oneFingerZoomGestureRecognizer.state) {
+		case UIGestureRecognizerStateBegan:
+			objc_setAssociatedObject(self, BDDRScrollViewAdditionsOneFingerZoomStartZoomScaleAssociationKey, @(self.zoomScale), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+			objc_setAssociatedObject(self, BDDRScrollViewAdditionsOneFingerZoomStartLocationYAssociationKey, @(currentLocationY), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+			objc_setAssociatedObject(self, BDDRScrollViewAdditionsOneFingerZoomBouncesZoomAtStartAssociationKey, @(self.bouncesZoom), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+			
+			if (self.bouncesZoom) {
+				self.minimumZoomScale /= self.bddr_zoomScaleStepFactor * 2.0f;
+				self.maximumZoomScale *= self.bddr_zoomScaleStepFactor * 2.0f;
+			}
+			break;
+		case UIGestureRecognizerStateChanged:
+		case UIGestureRecognizerStateEnded:
+		case UIGestureRecognizerStateCancelled: {
+			CGFloat startZoomScale = [objc_getAssociatedObject(self, BDDRScrollViewAdditionsOneFingerZoomStartZoomScaleAssociationKey) floatValue];
+			CGFloat startLocationY = [objc_getAssociatedObject(self, BDDRScrollViewAdditionsOneFingerZoomStartLocationYAssociationKey) floatValue];
+			BOOL bouncesZoomAtStart = [objc_getAssociatedObject(self, BDDRScrollViewAdditionsOneFingerZoomBouncesZoomAtStartAssociationKey) boolValue];
+			CGFloat locationYDifference = startLocationY - currentLocationY;
+			
+			// Use zoomScaleStepFactor for a quarter of the window's height, this means:
+			// For every quarter the finger moves, the zoom scale will be adjusted by one bddr_zoomScaleStepFactor,
+			// moving over the whole screen from bottom to top will zoom in by about 4 * bddr_zoomScaleStepFactor.
+			CGFloat zoomFactor = (self.bddr_zoomScaleStepFactor - 1.0f) / (self.window.bounds.size.height / 4.0f) * ABS(locationYDifference) + 1.0f;
+			self.zoomScale = startZoomScale * (locationYDifference > 0.0f ? zoomFactor : 1.0f / zoomFactor);
+			
+			if (bouncesZoomAtStart && oneFingerZoomGestureRecognizer.state != UIGestureRecognizerStateChanged) {
+				self.minimumZoomScale *= self.bddr_zoomScaleStepFactor * 2.0f;
+				self.maximumZoomScale /= self.bddr_zoomScaleStepFactor * 2.0f;
+				
+				if (self.zoomScale < self.minimumZoomScale)
+					[self setZoomScale:self.minimumZoomScale animated:YES];
+				else if (self.zoomScale > self.maximumZoomScale)
+					[self setZoomScale:self.maximumZoomScale animated:YES];
+			}
+			break;
+		}
+		default:
+			break;
 	}
 }
 

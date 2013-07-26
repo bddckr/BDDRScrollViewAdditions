@@ -76,10 +76,10 @@
 
 /*!
  * \brief A Boolean value that determines whether zooming with one finger is enabled.
- * \details If the value of this property is \c YES, the scroll view zooms the content when the user double taps and then moves the finger. This uses \c bddr_zoomScaleStepFactor for the zooming.
+ * \details If the value of this property is \c YES, the scroll view zooms the content when the user double taps and then moves the finger. This uses \c bddr_zoomScaleStepFactor for the zooming and respects \c bouncesZoom.
  * \details The default value is \c NO.
  * \attention When zooming is disabled, the scroll view does not enable zooming via this property. See the documentation of \c UIScrollView on how to enable zooming.
- * \see bddr_zoomScaleStepFactor, bddr_oneFingerZoomGestureRecognizer
+ * \see bddr_zoomScaleStepFactor, bddr_oneFingerZoomGestureRecognizer, bouncesZoom
  */
 @property (nonatomic, assign) BOOL bddr_oneFingerZoomEnabled;
 
