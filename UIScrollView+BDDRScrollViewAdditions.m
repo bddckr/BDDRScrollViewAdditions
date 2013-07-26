@@ -79,7 +79,7 @@ static void *const BDDRScrollViewAdditionsOneFingerZoomStartLocationYAssociation
 }
 
 - (void)bddr_handleDoubleTapZoomInGestureRecognizer:(UITapGestureRecognizer *)doubleTapZoomInGestureRecognizer {
-	if (self.zoomScale == self.maximumZoomScale && self.bddr_doubleTapZoomsToMinimumZoomScaleAtMaximumZoom) {
+	if (self.zoomScale == self.maximumZoomScale && self.bddr_doubleTapZoomsToMinimumZoomScaleWhenAtMaximumZoomScale) {
 		[self setZoomScale:self.minimumZoomScale animated:YES];
 		return;
 	}
@@ -225,19 +225,19 @@ static void *const BDDRScrollViewAdditionsOneFingerZoomStartLocationYAssociation
 	[self bddr_addOrRemoveDoubleTapZoomInGestureRecognizer];
 }
 
-- (BOOL)bddr_doubleTapZoomsToMinimumZoomScaleAtMaximumZoom {
-	NSNumber *doubleTapZoomsToMinimumZoomScaleAtMaximumZoomValue = objc_getAssociatedObject(self, @selector(bddr_doubleTapZoomsToMinimumZoomScaleAtMaximumZoom));
+- (BOOL)bddr_doubleTapZoomsToMinimumZoomScaleWhenAtMaximumZoomScale {
+	NSNumber *doubleTapZoomsToMinimumZoomScaleWhenAtMaximumZoomScaleNumber = objc_getAssociatedObject(self, @selector(bddr_doubleTapZoomsToMinimumZoomScaleWhenAtMaximumZoomScale));
 	
-	if (!doubleTapZoomsToMinimumZoomScaleAtMaximumZoomValue) {
-		doubleTapZoomsToMinimumZoomScaleAtMaximumZoomValue = @(YES);
-		objc_setAssociatedObject(self, @selector(bddr_doubleTapZoomsToMinimumZoomScaleAtMaximumZoom), doubleTapZoomsToMinimumZoomScaleAtMaximumZoomValue, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+	if (!doubleTapZoomsToMinimumZoomScaleWhenAtMaximumZoomScaleNumber) {
+		doubleTapZoomsToMinimumZoomScaleWhenAtMaximumZoomScaleNumber = @(YES);
+		objc_setAssociatedObject(self, @selector(bddr_doubleTapZoomsToMinimumZoomScaleWhenAtMaximumZoomScale), doubleTapZoomsToMinimumZoomScaleWhenAtMaximumZoomScaleNumber, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 	}
 	
-	return [doubleTapZoomsToMinimumZoomScaleAtMaximumZoomValue boolValue];
+	return [doubleTapZoomsToMinimumZoomScaleWhenAtMaximumZoomScaleNumber boolValue];
 }
 
-- (void)setBddr_doubleTapZoomsToMinimumZoomScaleAtMaximumZoom:(BOOL)doubleTapZoomsToMinimumZoomScaleAtMaximumZoom {
-	objc_setAssociatedObject(self, @selector(bddr_doubleTapZoomsToMinimumZoomScaleAtMaximumZoom), @(doubleTapZoomsToMinimumZoomScaleAtMaximumZoom), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+- (void)setBddr_doubleTapZoomsToMinimumZoomScaleWhenAtMaximumZoomScale:(BOOL)bddr_doubleTapZoomsToMinimumZoomScaleWhenAtMaximumZoomScale {
+	objc_setAssociatedObject(self, @selector(bddr_doubleTapZoomsToMinimumZoomScaleWhenAtMaximumZoomScale), @(bddr_doubleTapZoomsToMinimumZoomScaleWhenAtMaximumZoomScale), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
 
 - (UITapGestureRecognizer *)bddr_doubleTapZoomInGestureRecognizer {
@@ -266,14 +266,14 @@ static void *const BDDRScrollViewAdditionsOneFingerZoomStartLocationYAssociation
 }
 
 - (CGFloat)bddr_zoomScaleStepFactor {
-	NSNumber *zoomScaleStepFactorValue = objc_getAssociatedObject(self, @selector(bddr_zoomScaleStepFactor));
+	NSNumber *zoomScaleStepFactorNumber = objc_getAssociatedObject(self, @selector(bddr_zoomScaleStepFactor));
 	
-	if (!zoomScaleStepFactorValue) {
-		zoomScaleStepFactorValue = @(1.5f);
-		objc_setAssociatedObject(self, @selector(bddr_zoomScaleStepFactor), zoomScaleStepFactorValue, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+	if (!zoomScaleStepFactorNumber) {
+		zoomScaleStepFactorNumber = @(1.5f);
+		objc_setAssociatedObject(self, @selector(bddr_zoomScaleStepFactor), zoomScaleStepFactorNumber, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 	}
 	
-	return [zoomScaleStepFactorValue floatValue];
+	return [zoomScaleStepFactorNumber floatValue];
 }
 
 - (void)setBddr_zoomScaleStepFactor:(CGFloat)zoomScaleStepFactor {
