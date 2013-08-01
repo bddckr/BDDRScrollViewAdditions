@@ -50,15 +50,19 @@ static void *const BDDRScrollViewAdditionsOneFingerZoomBouncesZoomAtStartAssocia
 	CGFloat horizontalInset = 0.0f;
 	CGFloat verticalInset = 0.0f;
 	
-	if (self.bddr_centersContentHorizontally && contentSize.width < boundsSize.width)
-		horizontalInset = (boundsSize.width - contentSize.width) / 2.0f;
-	if (self.bddr_centersContentVertically && contentSize.height < boundsSize.height)
-		verticalInset = (boundsSize.height - contentSize.height) / 2.0f;
+	if (self.bddr_centersContent) {
+		if (contentSize.width < boundsSize.width)
+			horizontalInset = (boundsSize.width - contentSize.width) / 2.0f;
+		if (contentSize.height < boundsSize.height)
+			verticalInset = (boundsSize.height - contentSize.height) / 2.0f;
+	}
 	
-	[self bddr_setContentInset:UIEdgeInsetsMake(verticalInset + contentInset.top,
-												horizontalInset + contentInset.left,
-												verticalInset + contentInset.bottom,
-												horizontalInset + contentInset.right)];
+	contentInset.top += verticalInset;
+	contentInset.bottom += verticalInset;
+	contentInset.left += horizontalInset;
+	contentInset.right += horizontalInset;
+	
+	[self bddr_setContentInset:contentInset];
 }
 
 #pragma mark - Double Tap Zoom In
@@ -219,26 +223,12 @@ static void *const BDDRScrollViewAdditionsOneFingerZoomBouncesZoomAtStartAssocia
 
 #pragma mark - Getters and Setters
 
-- (void)bddr_setCentersContent:(BOOL)centersContent {
-	self.bddr_centersContentHorizontally = centersContent;
-	self.bddr_centersContentVertically = centersContent;
+- (BOOL)bddr_centersContent {
+	return [objc_getAssociatedObject(self, @selector(bddr_centersContent)) boolValue];
 }
 
-- (BOOL)bddr_centersContentHorizontally {
-	return [objc_getAssociatedObject(self, @selector(bddr_centersContentHorizontally)) boolValue];
-}
-
-- (void)setBddr_centersContentHorizontally:(BOOL)centersContentHorizontally {
-	objc_setAssociatedObject(self, @selector(bddr_centersContentHorizontally), @(centersContentHorizontally), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-	[self bddr_centerContentIfNeeded];
-}
-
-- (BOOL)bddr_centersContentVertically {
-	return [objc_getAssociatedObject(self, @selector(bddr_centersContentVertically)) boolValue];
-}
-
-- (void)setBddr_centersContentVertically:(BOOL)centersContentVertically {
-	objc_setAssociatedObject(self, @selector(bddr_centersContentVertically), @(centersContentVertically), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+- (void)setBddr_centersContent:(BOOL)centersContent {
+	objc_setAssociatedObject(self, @selector(bddr_centersContent), @(centersContent), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 	[self bddr_centerContentIfNeeded];
 }
 
