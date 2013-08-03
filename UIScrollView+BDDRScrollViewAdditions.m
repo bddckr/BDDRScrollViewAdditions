@@ -20,20 +20,12 @@ static void *const BDDRScrollViewAdditionsOneFingerZoomBouncesZoomAtStartAssocia
 		NSLog(@"%@", [error localizedDescription]);
 }
 
-#pragma mark - Utility Methods
+#pragma mark - Private Utility Methods
 
-- (CGRect)zoomRectForZoomScale:(CGFloat)zoomScale withLocationOfGestureRecognizer:(UIGestureRecognizer *)gestureRecognizer {
-	UIView *view = [self.delegate respondsToSelector:@selector(viewForZoomingInScrollView:)] ? [self.delegate viewForZoomingInScrollView:self] : self;
-	CGPoint location = [gestureRecognizer locationInView:view];
-	CGSize boundsSize = self.bounds.size;
-	CGRect zoomRect;
-	
-	zoomRect.size.width = boundsSize.width / zoomScale;
-	zoomRect.size.height = boundsSize.height / zoomScale;
-	zoomRect.origin.x = location.x - (zoomRect.size.width / 2.0f);
-	zoomRect.origin.y = location.y - (zoomRect.size.height / 2.0f);
-	
-	return zoomRect;
+- (CGRect)bddr_zoomRectForZoomScale:(CGFloat)zoomScale locationOfGestureRecognizer:(UIGestureRecognizer *)gestureRecognizer {
+	UIView *zoomView = [self.delegate respondsToSelector:@selector(viewForZoomingInScrollView:)] ? [self.delegate viewForZoomingInScrollView:self] : self;
+	CGPoint location = [gestureRecognizer locationInView:zoomView];
+	return [self bddr_zoomRectForZoomScale:zoomScale center:location];
 }
 
 #pragma mark - Content Centering
@@ -92,7 +84,7 @@ static void *const BDDRScrollViewAdditionsOneFingerZoomBouncesZoomAtStartAssocia
 	}
 	
 	CGFloat newZoomScale = self.zoomScale * self.bddr_zoomScaleStepFactor;
-	CGRect zoomRect = [self zoomRectForZoomScale:newZoomScale withLocationOfGestureRecognizer:doubleTapZoomInGestureRecognizer];
+	CGRect zoomRect = [self bddr_zoomRectForZoomScale:newZoomScale locationOfGestureRecognizer:doubleTapZoomInGestureRecognizer];
 	[self zoomToRect:zoomRect animated:YES];
 }
 
@@ -115,7 +107,7 @@ static void *const BDDRScrollViewAdditionsOneFingerZoomBouncesZoomAtStartAssocia
 	if (twoFingerZoomOutGestureRecognizer.state != UIGestureRecognizerStateEnded) return;
 	
 	CGFloat newZoomScale = self.zoomScale / self.bddr_zoomScaleStepFactor;
-	CGRect zoomRect = [self zoomRectForZoomScale:newZoomScale withLocationOfGestureRecognizer:twoFingerZoomOutGestureRecognizer];
+	CGRect zoomRect = [self bddr_zoomRectForZoomScale:newZoomScale locationOfGestureRecognizer:twoFingerZoomOutGestureRecognizer];
 	[self zoomToRect:zoomRect animated:YES];
 }
 
@@ -196,6 +188,25 @@ static void *const BDDRScrollViewAdditionsOneFingerZoomBouncesZoomAtStartAssocia
 - (void)bddr_setContentInset:(UIEdgeInsets)contentInset {
 	objc_setAssociatedObject(self, @selector(bddr_contentInset), [NSValue valueWithUIEdgeInsets:contentInset], OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 	[self bddr_centerContentIfNeeded];
+}
+
+#pragma mark - Calculated Rectangles
+
+- (CGRect)bddr_visibleRect {
+	UIView *zoomView = [self.delegate respondsToSelector:@selector(viewForZoomingInScrollView:)] ? [self.delegate viewForZoomingInScrollView:self] : self;
+	return [self convertRect:self.bounds toView:zoomView];
+}
+
+- (CGRect)bddr_zoomRectForZoomScale:(CGFloat)zoomScale center:(CGPoint)center {
+	CGSize boundsSize = self.bounds.size;
+	CGRect zoomRect;
+	
+	zoomRect.size.width = boundsSize.width / zoomScale;
+	zoomRect.size.height = boundsSize.height / zoomScale;
+	zoomRect.origin.x = center.x - (zoomRect.size.width / 2.0f);
+	zoomRect.origin.y = center.y - (zoomRect.size.height / 2.0f);
+	
+	return zoomRect;
 }
 
 #pragma mark - Getters of animated Properties

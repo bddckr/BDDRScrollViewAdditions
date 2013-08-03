@@ -96,6 +96,19 @@
 @property (nonatomic, assign) CGFloat bddr_zoomScaleStepFactor;
 
 /*!
+ * \brief The visible rectangle, which describes the content view's location and size in the receiver's coordinate system.
+ */
+@property (nonatomic, assign, readonly) CGRect bddr_visibleRect;
+
+/*!
+ * \brief Calculates a rectangle for a specified zoom scale and center point in the receiver's coordinate system.
+ * \param zoomScale The zoom scale of the receiver for the calculation of the returned rectangle.
+ * \param center The center of the returned rectangle.
+ * \returns A rectangle defining an area of the content view, centered at \c center and scaled by \c zoomScale.
+ */
+- (CGRect)bddr_zoomRectForZoomScale:(CGFloat)zoomScale center:(CGPoint)center;
+
+/*!
  * \brief The receiver's \c contentOffset property, during animations. (read-only)
  * \details \c contentOffset returns the wrong value if the receiver is animating, for example when \c zoomBouncing is \c YES.
  * \see contentOffset
