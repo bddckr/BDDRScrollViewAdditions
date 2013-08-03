@@ -84,6 +84,8 @@ static void *const BDDRScrollViewAdditionsOneFingerZoomBouncesZoomAtStartAssocia
 }
 
 - (void)bddr_handleDoubleTapZoomInGestureRecognizer:(UITapGestureRecognizer *)doubleTapZoomInGestureRecognizer {
+	if (doubleTapZoomInGestureRecognizer.state != UIGestureRecognizerStateEnded) return;
+	
 	if (self.zoomScale == self.maximumZoomScale && self.bddr_doubleTapZoomsToMinimumZoomScaleWhenAtMaximumZoomScale) {
 		[self setZoomScale:self.minimumZoomScale animated:YES];
 		return;
@@ -110,6 +112,8 @@ static void *const BDDRScrollViewAdditionsOneFingerZoomBouncesZoomAtStartAssocia
 }
 
 - (void)bddr_handleTwoFingerZoomOutGestureRecognizer:(UITapGestureRecognizer *)twoFingerZoomOutGestureRecognizer {
+	if (twoFingerZoomOutGestureRecognizer.state != UIGestureRecognizerStateEnded) return;
+	
 	CGFloat newZoomScale = self.zoomScale / self.bddr_zoomScaleStepFactor;
 	CGRect zoomRect = [self zoomRectForZoomScale:newZoomScale withLocationOfGestureRecognizer:twoFingerZoomOutGestureRecognizer];
 	[self zoomToRect:zoomRect animated:YES];
