@@ -1,12 +1,9 @@
 #import "UIScrollView+BDDRScrollViewAdditions.h"
+#import "BDDROneFingerZoomGestureRecognizer.h"
 #import "JRSwizzle.h"
 #import <objc/runtime.h>
 
 @implementation UIScrollView (BDDRScrollViewAdditions)
-
-static void *const BDDRScrollViewAdditionsOneFingerZoomStartZoomScaleAssociationKey = (void *)&BDDRScrollViewAdditionsOneFingerZoomStartZoomScaleAssociationKey;
-static void *const BDDRScrollViewAdditionsOneFingerZoomStartLocationYAssociationKey = (void *)&BDDRScrollViewAdditionsOneFingerZoomStartLocationYAssociationKey;
-static void *const BDDRScrollViewAdditionsOneFingerZoomBouncesZoomAtStartAssociationKey = (void *)&BDDRScrollViewAdditionsOneFingerZoomBouncesZoomAtStartAssociationKey;
 
 #pragma mark - Method Swizzling
 
@@ -66,9 +63,6 @@ static void *const BDDRScrollViewAdditionsOneFingerZoomBouncesZoomAtStartAssocia
 		doubleTapZoomInGestureRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(bddr_handleDoubleTapZoomInGestureRecognizer:)];
 		doubleTapZoomInGestureRecognizer.numberOfTapsRequired = 2;
 		[self addGestureRecognizer:doubleTapZoomInGestureRecognizer];
-		
-		if (self.bddr_oneFingerZoomGestureRecognizer)
-			[self.bddr_oneFingerZoomGestureRecognizer requireGestureRecognizerToFail:doubleTapZoomInGestureRecognizer];
 	} else
 		[self removeGestureRecognizer:self.bddr_doubleTapZoomInGestureRecognizer];
 	
@@ -114,53 +108,39 @@ static void *const BDDRScrollViewAdditionsOneFingerZoomBouncesZoomAtStartAssocia
 #pragma mark - One Finger Zoom
 
 - (void)bddr_addOrRemoveOneFingerZoomGestureRecognizer {
-	UILongPressGestureRecognizer *oneFingerZoomGestureRecognizer;
+	BDDROneFingerZoomGestureRecognizer *oneFingerZoomGestureRecognizer;
 	
 	if (self.bddr_oneFingerZoomEnabled) {
-		oneFingerZoomGestureRecognizer = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(bddr_handleOneFingerZoomGestureRecognizer:)];
-		oneFingerZoomGestureRecognizer.numberOfTapsRequired = 1;
-		oneFingerZoomGestureRecognizer.minimumPressDuration = 0.0f;
+		oneFingerZoomGestureRecognizer = [[BDDROneFingerZoomGestureRecognizer alloc] initWithTarget:self action:@selector(bddr_handleOneFingerZoomGestureRecognizer:)];
+		oneFingerZoomGestureRecognizer.bouncesScale = YES;
 		[self addGestureRecognizer:oneFingerZoomGestureRecognizer];
-		
-		if (self.bddr_doubleTapZoomInGestureRecognizer)
-			[oneFingerZoomGestureRecognizer requireGestureRecognizerToFail:self.bddr_doubleTapZoomInGestureRecognizer ];
 	} else
 		[self removeGestureRecognizer:self.bddr_oneFingerZoomGestureRecognizer];
 	
 	self.bddr_oneFingerZoomGestureRecognizer = oneFingerZoomGestureRecognizer;
 }
 
-- (void)bddr_handleOneFingerZoomGestureRecognizer:(UILongPressGestureRecognizer *)oneFingerZoomGestureRecognizer {
-	CGFloat currentLocationY = [oneFingerZoomGestureRecognizer locationInView:self.window].y;
-	
+- (void)bddr_handleOneFingerZoomGestureRecognizer:(BDDROneFingerZoomGestureRecognizer *)oneFingerZoomGestureRecognizer {
 	switch (oneFingerZoomGestureRecognizer.state) {
 		case UIGestureRecognizerStateBegan:
-			objc_setAssociatedObject(self, BDDRScrollViewAdditionsOneFingerZoomStartZoomScaleAssociationKey, @(self.zoomScale), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-			objc_setAssociatedObject(self, BDDRScrollViewAdditionsOneFingerZoomStartLocationYAssociationKey, @(currentLocationY), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-			objc_setAssociatedObject(self, BDDRScrollViewAdditionsOneFingerZoomBouncesZoomAtStartAssociationKey, @(self.bouncesZoom), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+			oneFingerZoomGestureRecognizer.scaleFactor = self.maximumZoomScale / self.minimumZoomScale;
+			oneFingerZoomGestureRecognizer.scale = self.zoomScale;
+			oneFingerZoomGestureRecognizer.minimumScale = self.minimumZoomScale;
+			oneFingerZoomGestureRecognizer.maximumScale = self.maximumZoomScale;
 			
 			if (self.bouncesZoom) {
-				self.minimumZoomScale /= self.bddr_zoomScaleStepFactor * 2.0f;
-				self.maximumZoomScale *= self.bddr_zoomScaleStepFactor * 2.0f;
+				self.minimumZoomScale /= 2.0f;
+				self.maximumZoomScale *= 2.0f;
 			}
 			break;
 		case UIGestureRecognizerStateChanged:
+			self.zoomScale = oneFingerZoomGestureRecognizer.scale;
+			break;
 		case UIGestureRecognizerStateEnded:
-		case UIGestureRecognizerStateCancelled: {
-			CGFloat startZoomScale = [objc_getAssociatedObject(self, BDDRScrollViewAdditionsOneFingerZoomStartZoomScaleAssociationKey) floatValue];
-			CGFloat startLocationY = [objc_getAssociatedObject(self, BDDRScrollViewAdditionsOneFingerZoomStartLocationYAssociationKey) floatValue];
-			BOOL bouncesZoomAtStart = [objc_getAssociatedObject(self, BDDRScrollViewAdditionsOneFingerZoomBouncesZoomAtStartAssociationKey) boolValue];
-			CGFloat locationYDifference = startLocationY - currentLocationY;
-			
-			// Use zoomScaleStepFactor for a quarter of the window's height, this means:
-			// For every quarter the finger moves, the zoom scale will be adjusted by one bddr_zoomScaleStepFactor,
-			// moving over the whole screen from bottom to top will zoom in by about 4 * bddr_zoomScaleStepFactor.
-			CGFloat zoomFactor = (self.bddr_zoomScaleStepFactor - 1.0f) / (self.window.bounds.size.height / 4.0f) * ABS(locationYDifference) + 1.0f;
-			self.zoomScale = startZoomScale * (locationYDifference > 0.0f ? zoomFactor : 1.0f / zoomFactor);
-			
-			if (bouncesZoomAtStart && oneFingerZoomGestureRecognizer.state != UIGestureRecognizerStateChanged) {
-				self.minimumZoomScale *= self.bddr_zoomScaleStepFactor * 2.0f;
-				self.maximumZoomScale /= self.bddr_zoomScaleStepFactor * 2.0f;
+		case UIGestureRecognizerStateCancelled:
+			if (self.bouncesZoom) {
+				self.minimumZoomScale *= 2.0f;
+				self.maximumZoomScale /= 2.0f;
 				
 				if (self.zoomScale < self.minimumZoomScale)
 					[self setZoomScale:self.minimumZoomScale animated:YES];
@@ -168,7 +148,6 @@ static void *const BDDRScrollViewAdditionsOneFingerZoomBouncesZoomAtStartAssocia
 					[self setZoomScale:self.maximumZoomScale animated:YES];
 			}
 			break;
-		}
 		default:
 			break;
 	}
@@ -296,6 +275,23 @@ static void *const BDDRScrollViewAdditionsOneFingerZoomBouncesZoomAtStartAssocia
 	objc_setAssociatedObject(self, @selector(bddr_twoFingerZoomOutGestureRecognizer), twoFingerZoomOutGestureRecognizer, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
 
+- (BOOL)bddr_oneFingerZoomEnabled {
+	return [objc_getAssociatedObject(self, @selector(bddr_oneFingerZoomEnabled)) boolValue];
+}
+
+- (void)setBddr_oneFingerZoomEnabled:(BOOL)oneFingerZoomEnabled {
+	objc_setAssociatedObject(self, @selector(bddr_oneFingerZoomEnabled), @(oneFingerZoomEnabled), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+	[self bddr_addOrRemoveOneFingerZoomGestureRecognizer];
+}
+
+- (BDDROneFingerZoomGestureRecognizer *)bddr_oneFingerZoomGestureRecognizer {
+	return objc_getAssociatedObject(self, @selector(bddr_oneFingerZoomGestureRecognizer));
+}
+
+- (void)setBddr_oneFingerZoomGestureRecognizer:(BDDROneFingerZoomGestureRecognizer *)oneFingerZoomGestureRecognizer {
+	objc_setAssociatedObject(self, @selector(bddr_oneFingerZoomGestureRecognizer), oneFingerZoomGestureRecognizer, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
+
 - (CGFloat)bddr_zoomScaleStepFactor {
 	NSNumber *zoomScaleStepFactorNumber = objc_getAssociatedObject(self, @selector(bddr_zoomScaleStepFactor));
 	
@@ -310,23 +306,6 @@ static void *const BDDRScrollViewAdditionsOneFingerZoomBouncesZoomAtStartAssocia
 - (void)setBddr_zoomScaleStepFactor:(CGFloat)zoomScaleStepFactor {
 	zoomScaleStepFactor = MAX(1.0f, zoomScaleStepFactor);
 	objc_setAssociatedObject(self, @selector(bddr_zoomScaleStepFactor), @(zoomScaleStepFactor), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-}
-
-- (BOOL)bddr_oneFingerZoomEnabled {
-	return [objc_getAssociatedObject(self, @selector(bddr_oneFingerZoomEnabled)) boolValue];
-}
-
-- (void)setBddr_oneFingerZoomEnabled:(BOOL)oneFingerZoomEnabled {
-	objc_setAssociatedObject(self, @selector(bddr_oneFingerZoomEnabled), @(oneFingerZoomEnabled), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-	[self bddr_addOrRemoveOneFingerZoomGestureRecognizer];
-}
-
-- (UILongPressGestureRecognizer *)bddr_oneFingerZoomGestureRecognizer {
-	return objc_getAssociatedObject(self, @selector(bddr_oneFingerZoomGestureRecognizer));
-}
-
-- (void)setBddr_oneFingerZoomGestureRecognizer:(UILongPressGestureRecognizer *)oneFingerZoomGestureRecognizer {
-	objc_setAssociatedObject(self, @selector(bddr_oneFingerZoomGestureRecognizer), oneFingerZoomGestureRecognizer, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
 
 @end

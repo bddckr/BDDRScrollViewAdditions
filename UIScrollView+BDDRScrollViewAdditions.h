@@ -84,7 +84,7 @@
  * \details This property is \c nil if \c bddr_oneFingerZoomEnabled is \c NO.
  * \see bddr_oneFingerZoomEnabled
  */
-@property (nonatomic, strong, readonly) UILongPressGestureRecognizer *bddr_oneFingerZoomGestureRecognizer;
+@property (nonatomic, strong, readonly) BDDROneFingerZoomGestureRecognizer *bddr_oneFingerZoomGestureRecognizer;
 
 /*!
  * \brief A floating-point value that specifies the scale factor applied to the scroll view's \c zoomScale when double-tap-zoom-in,

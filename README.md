@@ -8,7 +8,7 @@ This category adds properties to enable and configure:
 
 + Centering the content view, even when zooming out and having the `UIScrollView` bouncing. This also works for the view returned by `-viewForZoomingInScrollView:` of the `UIScrollViewDelegate` when zooming.
 
-+ Double-tapping to zoom in, two-finger-tapping to zoom out and one-finger-zooming ([like in the Google Maps iOS app](http://littlebigdetails.com/post/51559128905/)). Properties to access the gesture recognizers are provided.
++ Double-tapping to zoom in, two-finger-tapping to zoom out and one-finger-zooming ([see BDDROneFingerZoomGestureRecognizer](https://github.com/bddckr/BDDROneFingerZoomGestureRecognizer)). Properties to access the gesture recognizers are provided.
 
 Additionally, this category adds `zoomScale`, `contentOffset` and `contentSize` getters that return correct values when an animation is running on the `UIScrollView`. These new properties are not KVO compliant but can be polled repeatedly.  
 This is especially useful if you use an `UIScrollView` in your OpenGL View to scroll/zoom content: In your game loop you just poll the values to position and scale your rendered content.
