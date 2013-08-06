@@ -13,11 +13,13 @@ This category adds properties to enable and configure:
 Additionally, this category adds `zoomScale`, `contentOffset` and `contentSize` getters that return correct values when an animation is running on the `UIScrollView`. These new properties are not KVO compliant but can be polled repeatedly.  
 This is especially useful if you use an `UIScrollView` in your OpenGL View to scroll/zoom content: In your game loop you just poll the values to position and scale your rendered content.
 
+For more info see the [header](https://github.com/bddckr/BDDRScrollViewAdditions/blob/master/BDDRScrollViewAdditions/UIScrollView+BDDRScrollViewAdditions.h).
+
+<img src="https://github.com/bddckr/BDDRScrollViewAdditions/raw/master/Example.png" alt="Example" style="height: 400px;"/>
+
 ## Installation
 
-    $ cd /path/to/top/of/your/project
-    $ git submodule add git://github.com/bddckr/BDDRScrollViewAdditions.git BDDRScrollViewAdditions
-    $ git submodule update --init --recursive
+Simply add the files in the `UIScrollView+BDDRScrollViewAdditions.h` and `UIScrollView+BDDRScrollViewAdditions.m` to your project or add `BDDRScrollViewAdditions` to your Podfile if you're using CocoaPods.
 
 ## Reasons for Existence
 

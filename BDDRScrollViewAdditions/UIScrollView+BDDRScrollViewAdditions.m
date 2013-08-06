@@ -2,6 +2,7 @@
 #import "BDDROneFingerZoomGestureRecognizer.h"
 #import "JRSwizzle.h"
 #import <objc/runtime.h>
+#import <QuartzCore/QuartzCore.h>
 
 @implementation UIScrollView (BDDRScrollViewAdditions)
 
