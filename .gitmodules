@@ -1,6 +1,0 @@
-[submodule "JRSwizzle"]
-	path = JRSwizzle
-	url = git://github.com/rentzsch/jrswizzle.git
-[submodule "BDDROneFingerZoomGestureRecognizer"]
-	path = BDDROneFingerZoomGestureRecognizer
-	url = git://github.com/bddckr/BDDROneFingerZoomGestureRecognizer.git

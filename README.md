@@ -21,6 +21,8 @@ For more info see the [header](https://github.com/bddckr/BDDRScrollViewAdditions
 
 Simply add the files in the `UIScrollView+BDDRScrollViewAdditions.h` and `UIScrollView+BDDRScrollViewAdditions.m` to your project or add `BDDRScrollViewAdditions` to your Podfile if you're using CocoaPods.
 
+To run the example project clone the repo and run `pod install` in the Example folder.
+
 ## Reasons for Existence
 
 + Centering the content view is not done by default.
