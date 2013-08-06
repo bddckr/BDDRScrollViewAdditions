@@ -1,7 +1,7 @@
 Pod::Spec.new do |s|
   s.name          = 'BDDRScrollViewAdditions'
   s.version       = '1.0.0'
-  s.summary       = 'UIGestureRecognizer subclass to enable one-finger-zoom gestures.'
+  s.summary       = 'UIScrollView category to center content, enable additional zoom gestures and add getters for animated properties.'
   s.homepage      = 'https://github.com/bddckr/BDDRScrollViewAdditions'
   s.screenshots   = 'https://github.com/bddckr/BDDRScrollViewAdditions/raw/master/Example.png'
   s.license       = 'MIT'
