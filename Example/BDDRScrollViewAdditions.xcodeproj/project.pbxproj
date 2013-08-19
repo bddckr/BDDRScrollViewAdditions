@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		0F8878D2E74B41B0BDA72C4D /* libPods.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 470625C6C2D649DCBB4538A7 /* libPods.a */; };
 		EE42C6B217B0464E004BA34D /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EE42C6B117B0464E004BA34D /* UIKit.framework */; };
 		EE42C6B417B0464E004BA34D /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EE42C6B317B0464E004BA34D /* Foundation.framework */; };
 		EE42C6B617B0464E004BA34D /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EE42C6B517B0464E004BA34D /* CoreGraphics.framework */; };
@@ -17,11 +16,11 @@
 		EE42C6FA17B05016004BA34D /* UIScrollView+BDDRScrollViewAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = EE42C6F917B05016004BA34D /* UIScrollView+BDDRScrollViewAdditions.m */; };
 		EE42C6FC17B0594C004BA34D /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = EE42C6FB17B0594C004BA34D /* Default-568h@2x.png */; };
 		EE42C6FE17B059A6004BA34D /* Storyboard.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = EE42C6FD17B059A6004BA34D /* Storyboard.storyboard */; };
+		EE890D3817C26B39004A563F /* BDDROneFingerZoomGestureRecognizer.m in Sources */ = {isa = PBXBuildFile; fileRef = EE890D3517C26B39004A563F /* BDDROneFingerZoomGestureRecognizer.m */; };
+		EE890D3917C26B39004A563F /* JRSwizzle.m in Sources */ = {isa = PBXBuildFile; fileRef = EE890D3717C26B39004A563F /* JRSwizzle.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		470625C6C2D649DCBB4538A7 /* libPods.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libPods.a; sourceTree = BUILT_PRODUCTS_DIR; };
-		B5685E2B9CF6450F9B7F79B6 /* Pods.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.xcconfig; path = Pods/Pods.xcconfig; sourceTree = SOURCE_ROOT; };
 		EE42C6AE17B0464E004BA34D /* BDDRScrollViewAdditions.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BDDRScrollViewAdditions.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		EE42C6B117B0464E004BA34D /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		EE42C6B317B0464E004BA34D /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -37,6 +36,10 @@
 		EE42C6F917B05016004BA34D /* UIScrollView+BDDRScrollViewAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIScrollView+BDDRScrollViewAdditions.m"; sourceTree = "<group>"; };
 		EE42C6FB17B0594C004BA34D /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-568h@2x.png"; sourceTree = "<group>"; };
 		EE42C6FD17B059A6004BA34D /* Storyboard.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Storyboard.storyboard; sourceTree = "<group>"; };
+		EE890D3417C26B39004A563F /* BDDROneFingerZoomGestureRecognizer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BDDROneFingerZoomGestureRecognizer.h; path = Vendor/BDDROneFingerZoomGestureRecognizer.h; sourceTree = SOURCE_ROOT; };
+		EE890D3517C26B39004A563F /* BDDROneFingerZoomGestureRecognizer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = BDDROneFingerZoomGestureRecognizer.m; path = Vendor/BDDROneFingerZoomGestureRecognizer.m; sourceTree = SOURCE_ROOT; };
+		EE890D3617C26B39004A563F /* JRSwizzle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JRSwizzle.h; path = Vendor/JRSwizzle.h; sourceTree = SOURCE_ROOT; };
+		EE890D3717C26B39004A563F /* JRSwizzle.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = JRSwizzle.m; path = Vendor/JRSwizzle.m; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -47,7 +50,6 @@
 				EE42C6B217B0464E004BA34D /* UIKit.framework in Frameworks */,
 				EE42C6B417B0464E004BA34D /* Foundation.framework in Frameworks */,
 				EE42C6B617B0464E004BA34D /* CoreGraphics.framework in Frameworks */,
-				0F8878D2E74B41B0BDA72C4D /* libPods.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -57,13 +59,12 @@
 		EE42C6A517B0464E004BA34D = {
 			isa = PBXGroup;
 			children = (
-				EE42C6F717B05016004BA34D /* BDDRScrollViewAdditions */,
 				EE42C6E917B04FF6004BA34D /* Classes */,
+				EE42C6F717B05016004BA34D /* Vendor */,
 				EE42C6EE17B04FF6004BA34D /* Other Sources */,
 				EE42C6F117B04FF6004BA34D /* Resources */,
 				EE42C6B017B0464E004BA34D /* Frameworks */,
 				EE42C6AF17B0464E004BA34D /* Products */,
-				B5685E2B9CF6450F9B7F79B6 /* Pods.xcconfig */,
 			);
 			sourceTree = "<group>";
 		};
@@ -81,7 +82,6 @@
 				EE42C6B117B0464E004BA34D /* UIKit.framework */,
 				EE42C6B317B0464E004BA34D /* Foundation.framework */,
 				EE42C6B517B0464E004BA34D /* CoreGraphics.framework */,
-				470625C6C2D649DCBB4538A7 /* libPods.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -116,13 +116,17 @@
 			path = Resources;
 			sourceTree = "<group>";
 		};
-		EE42C6F717B05016004BA34D /* BDDRScrollViewAdditions */ = {
+		EE42C6F717B05016004BA34D /* Vendor */ = {
 			isa = PBXGroup;
 			children = (
 				EE42C6F817B05016004BA34D /* UIScrollView+BDDRScrollViewAdditions.h */,
 				EE42C6F917B05016004BA34D /* UIScrollView+BDDRScrollViewAdditions.m */,
+				EE890D3417C26B39004A563F /* BDDROneFingerZoomGestureRecognizer.h */,
+				EE890D3517C26B39004A563F /* BDDROneFingerZoomGestureRecognizer.m */,
+				EE890D3617C26B39004A563F /* JRSwizzle.h */,
+				EE890D3717C26B39004A563F /* JRSwizzle.m */,
 			);
-			name = BDDRScrollViewAdditions;
+			name = Vendor;
 			path = ../BDDRScrollViewAdditions;
 			sourceTree = "<group>";
 		};
@@ -133,11 +137,9 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = EE42C6D417B0464E004BA34D /* Build configuration list for PBXNativeTarget "BDDRScrollViewAdditions" */;
 			buildPhases = (
-				621F99D366684AD79197DF4A /* Check Pods Manifest.lock */,
 				EE42C6AA17B0464E004BA34D /* Sources */,
 				EE42C6AB17B0464E004BA34D /* Frameworks */,
 				EE42C6AC17B0464E004BA34D /* Resources */,
-				12A00BD846A14D3DA0322C2F /* Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -187,39 +189,6 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
-/* Begin PBXShellScriptBuildPhase section */
-		12A00BD846A14D3DA0322C2F /* Copy Pods Resources */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "Copy Pods Resources";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Pods-resources.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		621F99D366684AD79197DF4A /* Check Pods Manifest.lock */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "Check Pods Manifest.lock";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [[ $? != 0 ]] ; then\n    cat << EOM\nerror: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\nEOM\n    exit 1\nfi\n";
-			showEnvVarsInLog = 0;
-		};
-/* End PBXShellScriptBuildPhase section */
-
 /* Begin PBXSourcesBuildPhase section */
 		EE42C6AA17B0464E004BA34D /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
@@ -229,6 +198,8 @@
 				EE42C6F417B04FF6004BA34D /* BDDRViewController.m in Sources */,
 				EE42C6F517B04FF6004BA34D /* main.m in Sources */,
 				EE42C6FA17B05016004BA34D /* UIScrollView+BDDRScrollViewAdditions.m in Sources */,
+				EE890D3817C26B39004A563F /* BDDROneFingerZoomGestureRecognizer.m in Sources */,
+				EE890D3917C26B39004A563F /* JRSwizzle.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -295,7 +266,6 @@
 		};
 		EE42C6D517B0464E004BA34D /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = B5685E2B9CF6450F9B7F79B6 /* Pods.xcconfig */;
 			buildSettings = {
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Other Sources/BDDRScrollViewAdditions-Prefix.pch";
@@ -307,7 +277,6 @@
 		};
 		EE42C6D617B0464E004BA34D /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = B5685E2B9CF6450F9B7F79B6 /* Pods.xcconfig */;
 			buildSettings = {
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Other Sources/BDDRScrollViewAdditions-Prefix.pch";
