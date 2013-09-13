@@ -133,12 +133,24 @@
 				self.minimumZoomScale /= 2.0f;
 				self.maximumZoomScale *= 2.0f;
 			}
+			
+			if ([self.delegate respondsToSelector:@selector(scrollViewWillBeginZooming:withView:)])
+				[self.delegate scrollViewWillBeginZooming:self withView:[self.delegate viewForZoomingInScrollView:self]];
 			break;
 		case UIGestureRecognizerStateChanged:
 			self.zoomScale = oneFingerZoomGestureRecognizer.scale;
 			break;
 		case UIGestureRecognizerStateEnded:
-		case UIGestureRecognizerStateCancelled:
+		case UIGestureRecognizerStateCancelled: {
+			void(^notifyDelegate)(void);
+			
+			if ([self.delegate respondsToSelector:@selector(scrollViewDidEndZooming:withView:atScale:)])
+				notifyDelegate = ^(void) {
+					[self.delegate scrollViewDidEndZooming:self withView:[self.delegate viewForZoomingInScrollView:self] atScale:oneFingerZoomGestureRecognizer.scale];
+				};
+			else
+				notifyDelegate = ^(void){};
+			
 			if (self.bouncesZoom) {
 				self.minimumZoomScale *= 2.0f;
 				self.maximumZoomScale /= 2.0f;
@@ -147,8 +159,12 @@
 					[self setZoomScale:self.minimumZoomScale animated:YES];
 				else if (self.zoomScale > self.maximumZoomScale)
 					[self setZoomScale:self.maximumZoomScale animated:YES];
-			}
+				else
+					notifyDelegate();
+			} else
+				notifyDelegate();
 			break;
+		}
 		default:
 			break;
 	}
