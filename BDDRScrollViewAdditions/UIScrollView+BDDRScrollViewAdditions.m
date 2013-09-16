@@ -28,11 +28,6 @@
 
 #pragma mark - Content Centering
 
-- (void)bddr_centerContentIfNeeded {
-	if (!self.tracking)
-		[self bddr_centerContent];
-}
-
 - (void)bddr_centerContent {
 	CGSize contentSize = self.contentSize;
 	CGSize boundsSize = self.bounds.size;
@@ -141,15 +136,9 @@
 			self.zoomScale = oneFingerZoomGestureRecognizer.scale;
 			break;
 		case UIGestureRecognizerStateEnded:
-		case UIGestureRecognizerStateCancelled: {
-			void(^notifyDelegate)(void);
-			
+		case UIGestureRecognizerStateCancelled:
 			if ([self.delegate respondsToSelector:@selector(scrollViewDidEndZooming:withView:atScale:)])
-				notifyDelegate = ^(void) {
-					[self.delegate scrollViewDidEndZooming:self withView:[self.delegate viewForZoomingInScrollView:self] atScale:oneFingerZoomGestureRecognizer.scale];
-				};
-			else
-				notifyDelegate = ^(void){};
+				[self.delegate scrollViewDidEndZooming:self withView:[self.delegate viewForZoomingInScrollView:self] atScale:oneFingerZoomGestureRecognizer.scale];
 			
 			if (self.bouncesZoom) {
 				self.minimumZoomScale *= 2.0f;
@@ -159,12 +148,8 @@
 					[self setZoomScale:self.minimumZoomScale animated:YES];
 				else if (self.zoomScale > self.maximumZoomScale)
 					[self setZoomScale:self.maximumZoomScale animated:YES];
-				else
-					notifyDelegate();
-			} else
-				notifyDelegate();
+			}
 			break;
-		}
 		default:
 			break;
 	}
@@ -183,7 +168,7 @@
 
 - (void)bddr_setContentInset:(UIEdgeInsets)contentInset {
 	objc_setAssociatedObject(self, @selector(bddr_contentInset), [NSValue valueWithUIEdgeInsets:contentInset], OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-	[self bddr_centerContentIfNeeded];
+	[self bddr_centerContent];
 }
 
 #pragma mark - Calculated Rectangles
@@ -240,7 +225,7 @@
 
 - (void)setBddr_centersContent:(BOOL)centersContent {
 	objc_setAssociatedObject(self, @selector(bddr_centersContent), @(centersContent), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-	[self bddr_centerContentIfNeeded];
+	[self bddr_centerContent];
 }
 
 - (BOOL)bddr_doubleTapZoomInEnabled {
