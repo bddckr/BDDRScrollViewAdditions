@@ -1,4 +1,7 @@
 # BDDRScrollViewAdditions
+[![The MIT License (MIT)](https://go-shields.herokuapp.com/license-MIT-blue.png)][MIT]
+[![Platform](https://cocoapod-badges.herokuapp.com/p/BDDRScrollViewAdditions/badge.png)][CocoaDocs]
+[![Version](https://cocoapod-badges.herokuapp.com/v/BDDRScrollViewAdditions/badge.png)][CocoaDocs]
 
 ## Description
 
@@ -13,7 +16,7 @@ This category adds properties to enable and configure:
 Additionally, this category adds `zoomScale`, `contentOffset` and `contentSize` getters that return correct values when an animation is running on the `UIScrollView`. These new properties are not KVO compliant but can be polled repeatedly.  
 This is especially useful if you use an `UIScrollView` in your OpenGL View to scroll/zoom content: In your game loop you just poll the values to position and scale your rendered content.
 
-For more info see the [header](https://github.com/bddckr/BDDRScrollViewAdditions/blob/master/BDDRScrollViewAdditions/UIScrollView+BDDRScrollViewAdditions.h).
+For more info see the [header].
 
 <img src="https://github.com/bddckr/BDDRScrollViewAdditions/raw/master/Example.png" alt="Example" style="height: 400px;"/>
 
@@ -22,6 +25,10 @@ For more info see the [header](https://github.com/bddckr/BDDRScrollViewAdditions
 Simply add the files in the `UIScrollView+BDDRScrollViewAdditions.h` and `UIScrollView+BDDRScrollViewAdditions.m` to your project or add `BDDRScrollViewAdditions` to your Podfile if you're using CocoaPods.
 
 To run the example project clone the repo and run `pod install` in the Example folder.
+
+## Documentation
+
+Everything is documented in the [header file][header]. A rendered version is available on [CocoaDocs].
 
 ## Reasons for Existence
 
@@ -38,4 +45,8 @@ Follow [@bddckr](https://twitter.com/bddckr) on Twitter.
 ## Copyright and License
 
 Copyright (c) 2013 Christopher - Marcel Böddecker  
-Licensed under [The MIT License (MIT)](http://choosealicense.com/licenses/mit).
+Licensed under [The MIT License (MIT)][MIT].
+
+[MIT]: http://choosealicense.com/licenses/mit
+[CocoaDocs]: http://cocoadocs.org/docsets/BDDRScrollViewAdditions
+[header]: https://github.com/bddckr/BDDRScrollViewAdditions/blob/master/BDDRScrollViewAdditions/UIScrollView+BDDRScrollViewAdditions.h
