@@ -44,7 +44,7 @@ Follow [@bddckr](https://twitter.com/bddckr) on Twitter.
 
 ## Copyright and License
 
-Copyright (c) 2013 Christopher - Marcel Böddecker  
+Copyright (c) 2013-2014 Christopher - Marcel Böddecker  
 Licensed under [The MIT License (MIT)][MIT].
 
 [MIT]: http://choosealicense.com/licenses/mit
