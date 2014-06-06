@@ -1,3 +1,6 @@
 [submodule "BDDRScrollViewAdditions/Submodules/BDDROneFingerZoomGestureRecognizer"]
 	path = BDDRScrollViewAdditions/Submodules/BDDROneFingerZoomGestureRecognizer
 	url = https://github.com/bddckr/BDDROneFingerZoomGestureRecognizer.git
+[submodule "BDDRScrollViewAdditions/Submodules/JRSwizzle"]
+	path = BDDRScrollViewAdditions/Submodules/JRSwizzle
+	url = https://github.com/rentzsch/jrswizzle.git
